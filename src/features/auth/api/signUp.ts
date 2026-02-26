@@ -1,5 +1,5 @@
 import { z } from "zod";
-import instanceApi from "../../../utils/axios";
+import instanceApi from "../../../shared/utils/axios";
 import { BaseResponse } from "../types/response";
 
 export const signUpResponseSchema = z.object({
