@@ -8,6 +8,7 @@ import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "../../../shared/utils/constant";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify"
+import { Link } from "react-router";
 
 export default function SignUpPage() {
   const {
@@ -47,7 +48,7 @@ export default function SignUpPage() {
       }
 
       secureLocalStorage.setItem(AUTH_KEY, response.data);
-      // window.location.replace("/home/chat");
+      window.location.replace("/home/chat");
     } catch (error) {
       if (error instanceof AxiosError) {
         return toast.error(error?.response?.data?.message ?? "An error occured");
@@ -80,7 +81,6 @@ export default function SignUpPage() {
             />
           </section>
           <form
-            action="sign-in.html"
             className="flex flex-col gap-10"
             onSubmit={handleSubmit(onSubmit)}
           >
@@ -283,12 +283,12 @@ export default function SignUpPage() {
               </button>
               <p className="font-semibold leading-5 text-center">
                 Already Have Account?{" "}
-                <a
-                  href="sign-in.html"
+                <Link
+                  to="/sign-in"
                   className="text-heyhao-blue hover:underline"
                 >
                   Login Now
-                </a>
+                </Link>
               </p>
             </section>
           </form>

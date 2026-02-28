@@ -10,21 +10,6 @@ export const useSignUp = () => {
     FormData
   >({
     mutationFn: (data: FormData) => signUp(data),
-    onSuccess: (response) => {
-      console.log("Success Message:", response.message);
-      console.log("Data:", response.data);
-      console.log("Status Code: 200/201 (Success)");
-    },
-    onError: (error) => {
-      console.log("Error Message:", error.response?.data?.message || error.message);
-      console.log("Status Code:", error.response?.status);
-    },
-    onMutate: (data) => {
-      console.log("Sending Form Data", data);
-    },
-    onSettled: (data, error) => {
-      console.log("Settled", { data, error });
-    },
   });
 
   return {
