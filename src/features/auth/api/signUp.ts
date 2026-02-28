@@ -12,12 +12,12 @@ export const signUpResponseSchema = z.object({
 
 export type SignUpResponse = z.infer<typeof signUpResponseSchema>;
 
-export const signUp = (data: FormData): Promise<BaseResponse<SignUpResponse>> =>
-  instanceApi
-    .post("/auth/register", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((res) => res.data)
-    .catch((err) => err);
+export const signUp = async (data: FormData): Promise<BaseResponse<SignUpResponse>> => {
+  const response = await instanceApi.post<BaseResponse<SignUpResponse>>("/auth/sign-up", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};

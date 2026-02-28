@@ -7,6 +7,7 @@ import { useSignUp } from "../hooks/useSignUp";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "../../../shared/utils/constant";
 import { AxiosError } from "axios";
+import { toast } from "react-toastify"
 
 export default function SignUpPage() {
   const {
@@ -39,16 +40,22 @@ export default function SignUpPage() {
 
       const response = await mutateAsync(formData);
 
+      if (response.success) {
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+
       secureLocalStorage.setItem(AUTH_KEY, response.data);
-      window.location.replace("/home/chat");
+      // window.location.replace("/home/chat");
     } catch (error) {
       if (error instanceof AxiosError) {
-        return alert(error?.response?.data?.message ?? "An error occured");
+        return toast.error(error?.response?.data?.message ?? "An error occured");
       }
 
       const err = error as Error;
 
-      alert(err?.message ?? "An error occured");
+      toast.error(err?.message ?? "An error occured");
     }
   };
 
