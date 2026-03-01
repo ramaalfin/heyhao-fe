@@ -33,8 +33,6 @@ export default function DetailGroupPage() {
                 toast(response.message || "Successfully joined group!", {
                     type: "success",
                 });
-                /* Using window.location.href because midtrans redirect_url is an external sandbox URL, 
-                   not reachable via react-router's navigate */
                 window.location.href = response.data.redirect_url;
             }
         } catch (error: any) {
@@ -66,7 +64,8 @@ export default function DetailGroupPage() {
         type,
         photo_url,
         assets,
-        room
+        room,
+        is_join
     } = group;
 
     const memberCount = room?._count?.members || 0;
@@ -265,15 +264,15 @@ export default function DetailGroupPage() {
                                     <section id="Group-Price" className="flex flex-col gap-[12px]">
                                         <h2 className="font-semibold leading-5">Group Price</h2>
                                         <div className="flex items-center justify-between">
-                                            <input type="text" className="font-semibold text-2xl leading-[30px] text-heyhao-coral focus:outline-none" value="Rp12.500.000" readOnly />
+                                            <input type="text" className="font-semibold text-2xl leading-[30px] text-heyhao-coral focus:outline-none" value={`Rp ${group?.price?.toLocaleString("id-ID")}`} readOnly />
                                             <div className="py-[6px] px-2 rounded-lg bg-heyhao-grey flex items-center gap-[2px]">
                                                 <img src="/assets/images/icons/clock-grey-fill.svg" alt="icon" className="size-4 shrink-0" />
                                                 <p className="font-medium text-sm leading-[17.5px] text-heyhao-secondary">LIFETIME</p>
                                             </div>
                                         </div>
                                     </section>
-                                    <button onClick={handleJoinPaidGroup} disabled={isPendingTransaction} type="button" className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center">
-                                        {isPendingTransaction ? "Processing..." : "Pay With Midtrains & Join"}
+                                    <button onClick={handleJoinPaidGroup} disabled={isPendingTransaction || is_join} type="button" className={`rounded-full py-4 text-white w-full font-bold leading-[20px] text-center ${is_join ? "bg-heyhao-grey text-heyhao-secondary" : "bg-heyhao-blue"}`}>
+                                        {is_join ? "Already Joined" : (isPendingTransaction ? "Processing..." : "Pay With Midtrains & Join")}
                                     </button>
                                 </div>
                             </form>
@@ -294,8 +293,8 @@ export default function DetailGroupPage() {
                                         </div>
                                     </section>
                                     <hr className="border-heyhao-border" />
-                                    <button onClick={handleJoinFreeGroup} disabled={isPendingFree} type="button" className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center">
-                                        {isPendingFree ? "Joining..." : "Join Group for Free"}
+                                    <button onClick={handleJoinFreeGroup} disabled={isPendingFree || is_join} type="button" className={`rounded-full py-4 text-white w-full font-bold leading-[20px] text-center ${is_join ? "bg-heyhao-grey text-heyhao-secondary" : "bg-heyhao-blue"}`}>
+                                        {is_join ? "Already Joined" : (isPendingFree ? "Joining..." : "Join Group for Free")}
                                     </button>
                                 </div>
                             </form>

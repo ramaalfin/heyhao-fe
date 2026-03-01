@@ -8,6 +8,8 @@ export const getDetailGroupResponseSchema = z.object({
     about: z.string(),
     type: z.string(),
     photo_url: z.string(),
+    is_join: z.boolean().optional(),
+    price: z.number(),
     assets: z.array(z.object({
         filename: z.string()
     })),

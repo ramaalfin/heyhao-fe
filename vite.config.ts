@@ -8,4 +8,13 @@ export default defineConfig({
   define: {
     "process.env": {},
   },
+  server: {
+    allowedHosts: ["f5d1-182-253-58-87.ngrok-free.app"],
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
+  }
 });
