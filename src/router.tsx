@@ -8,84 +8,64 @@ import LayoutPage from "./shared/components/LayoutPage";
 import DiscoverPage from "./features/discover/pages/DiscoverPage";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "./shared/utils/constant";
+import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
+
+const requireAuthLoader = () => {
+  const auth = secureLocalStorage.getItem(AUTH_KEY);
+  if (!auth) {
+    throw redirect("/sign-in");
+  }
+  return true;
+};
+
+const requireNoAuthLoader = () => {
+  const auth = secureLocalStorage.getItem(AUTH_KEY);
+  if (auth) {
+    throw redirect("/home/discover");
+  }
+  return true;
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingPage />,
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-      return true;
-    },
+    loader: requireNoAuthLoader,
   },
   {
     path: "/sign-up",
     element: <SignUpPage />,
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-      return true;
-    },
+    loader: requireNoAuthLoader,
   },
   {
     path: "/sign-in",
     element: <SignInPage />,
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-      return true;
-    },
+    loader: requireNoAuthLoader,
   },
   {
     path: "/forgot-password",
     element: <ForgotPasswordPage />,
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-      return true;
-    },
+    loader: requireNoAuthLoader,
   },
   {
     path: "/forgot-password/:token",
     element: <UpdatePasswordPage />,
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-      return true;
-    },
+    loader: requireNoAuthLoader,
   },
   {
     path: "/home",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-      if (!auth) {
-        throw redirect("/sign-in");
-      }
-      return true;
-    },
+    loader: requireAuthLoader,
     element: <LayoutPage />,
     children: [
       {
         path: "/home/discover",
         element: <DiscoverPage />,
-        loader: () => {
-          const auth = secureLocalStorage.getItem(AUTH_KEY);
-          if (!auth) {
-            throw redirect("/sign-in");
-          }
-          return true;
-        },
+        loader: requireAuthLoader,
+      },
+      {
+        path: "/home/discover/group/:id",
+        element: <DetailGroupPage />,
+        loader: requireAuthLoader,
       }
     ]
   }
