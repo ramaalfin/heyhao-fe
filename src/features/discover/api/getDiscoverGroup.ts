@@ -14,11 +14,11 @@ export const getDiscoverGroupResponseSchema = z.object({
 export type GetDiscoverGroupResponse = z.infer<typeof getDiscoverGroupResponseSchema>;
 
 export const getDiscoverGroup = async (
-    query?: string
+    name?: string
 ): Promise<BaseResponse<GetDiscoverGroupResponse>> => {
     const response = await instanceApiWithToken.get<BaseResponse<GetDiscoverGroupResponse>>("/groups", {
         params: {
-            query
+            name
         }
     });
 

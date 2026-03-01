@@ -15,7 +15,7 @@ export default function SearchForm() {
         if (data.query.trim() === "") {
             navigate(`/home/discover`);
         } else {
-            navigate(`/home/discover?q=${data.query}`);
+            navigate(`/home/discover?name=${data.query}`);
         }
     };
 
@@ -43,7 +43,7 @@ export default function SearchForm() {
             <input
                 type="text"
                 className="bg-white w-[545px] h-[56px] rounded-2xl pl-[48px] border border-heyhao-border placeholder:font-semibold placeholder:text-base placeholder:leading-[20px] placeholder:text-heyhao-secondary font-semibold text-base leading-[20px] text-heyhao-black outline-none focus:border-heyhao-blue transition-all duration-300 pr-4"
-                placeholder="Discover your group. Build your network."
+                placeholder="Discover your group or people. Build your network."
                 {...register("query")}
             />
         </form>

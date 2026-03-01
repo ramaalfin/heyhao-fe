@@ -4,24 +4,22 @@ import { useEffect, useState } from "react";
 import { useDiscoverGroup } from "../hooks/useDiscoverGroup";
 import { GetDiscoverGroupResponse } from "../api/getDiscoverGroup";
 import SearchForm from "../components/SearchForm";
+import PeopleCard from "../components/PeopleCard";
+import { useDiscoverPeople } from "../hooks/useDiscoverPeople";
 
 export default function DiscoverPage() {
     const [tab, setTab] = useState<"GROUP" | "PEOPLE">("GROUP");
     const [searchParams, setSearchParams] = useSearchParams();
-    const [groups, setGroups] = useState<any>([]);
-    const query = searchParams.get("q");
+    const query = searchParams.get("name");
 
-    const { mutateAsync: getDiscoverGroup, isPending, error } = useDiscoverGroup();
+    const { data: groupData, isLoading: isPendingGroup, error: errorGroup } = useDiscoverGroup(tab === "GROUP", query ?? undefined);
+    const { data: peopleData, isLoading: isPendingPeople, error: errorPeople } = useDiscoverPeople(tab === "PEOPLE", query ?? undefined);
 
     useEffect(() => {
-        getDiscoverGroup(query ?? undefined).then((res) => {
-            setGroups(res.data);
-        });
-
         if (!query) {
             setSearchParams({});
         }
-    }, [query]);
+    }, [query, tab]);
 
     return (
         <main id="Main-Content-Container" className="relative flex flex-1 flex-col bg-white overflow-y-auto">
@@ -118,79 +116,145 @@ export default function DiscoverPage() {
             <div className="w-full flex flex-col gap-[30px] p-[30px]">
                 {tab === "GROUP" && (
                     <section id="Featured-Groups" className="flex flex-col gap-[12px]">
-                        <h2 className="font-semibold text-xl leading-[25px]">Featured Groups</h2>
-                        <div id="Cards-Item" className="grid grid-cols-3 gap-4">
-                            {!isPending && groups.length > 0 ? (
-                                groups.map((group: GetDiscoverGroupResponse) => (
-                                    <GroupCard key={group.id} group={group} />
-                                ))
-                            ) : (
-                                <p className="text-center text-heyhao-secondary">No groups found</p>
-                            )}
+                        {!isPendingGroup && groupData && (groupData as any).length > 0 && (
+                            <>
+                                <h2 className="font-semibold text-xl leading-[25px]">Featured Groups</h2>
+                                <div id="Cards-Item" className="grid grid-cols-3 gap-4">
+                                    {(groupData as any).map((group: GetDiscoverGroupResponse) => (
+                                        <GroupCard key={group.id} group={group} />
+                                    ))}
+                                </div>
 
-                            {isPending && (
-                                <p className="text-center text-heyhao-secondary">Loading...</p>
-                            )}
+                                <section id="Pagination" className="mx-auto">
+                                    <ul className="flex items-center gap-4">
+                                        <div id="Step-Before" className="group nonactive shrink-0">
+                                            <button type="button" id="Step-Before-Active" className="group-[&.nonactive]:hidden group-[&.active]:block p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                                <img src="/assets/images/icons/arrow-left.svg" alt="icon" className="size-6 shrink-0" />
+                                            </button>
+                                            <button disabled type="button" id="Step-Before-Nonactive" className="group-[&.nonactive]:block group-[&.active]:hidden p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                                <img src="/assets/images/icons/arrow-left-nonactive.svg" alt="icon" className="size-6 shrink-0" />
+                                            </button>
+                                        </div>
+                                        <div id="Steps" className="flex items-center gap-4">
+                                            <li className="group active">
+                                                <Link to="">
+                                                    <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
+                                                        <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">1</p>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                            <li className="group">
+                                                <Link to="">
+                                                    <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
+                                                        <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">2</p>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                            <li className="group">
+                                                <Link to="">
+                                                    <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
+                                                        <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">3</p>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                        </div>
+                                        <div id="Step-After" className="group active shrink-0">
+                                            <button type="button" id="Step-After-Active" className="group-[&.nonactive]:hidden group-[&.active]:block p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                                <img src="/assets/images/icons/arrow-left.svg" alt="icon" className="size-6 rotate-180" />
+                                            </button>
+                                            <button disabled type="button" id="Step-After-Nonactive" className="group-[&.nonactive]:block group-[&.active]:hidden p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                                <img src="/assets/images/icons/arrow-left-nonactive.svg" alt="icon" className="size-6 rotate-180" />
+                                            </button>
+                                        </div>
+                                    </ul>
+                                </section>
+                            </>
+                        )}
 
-                            {error && (
-                                <p className="text-center text-heyhao-secondary">Error: {error.message}</p>
-                            )}
-                        </div>
+                        {!isPendingGroup && groupData && (groupData as any).length === 0 && (
+                            <p className="text-center text-heyhao-secondary">No groups found</p>
+                        )}
+
+                        {isPendingGroup && (
+                            <p className="text-center text-heyhao-secondary">Loading...</p>
+                        )}
+
+                        {errorGroup && (
+                            <p className="text-center text-heyhao-secondary">Error: {errorGroup.message}</p>
+                        )}
                     </section>
                 )}
 
                 {tab === "PEOPLE" && (
-                    <section id="Featured-People" className="flex flex-col gap-[12px]">
-                        <h2 className="font-semibold text-xl leading-[25px]">Featured People</h2>
-                        <div id="Cards-Item" className="grid grid-cols-3 gap-4">
-                            <p>people</p>
+                    <section id="ContainerPeople" className="w-full p-[30px]">
+                        <div id="Result-People" className="flex flex-col gap-4">
+                            {!isPendingPeople && peopleData && (peopleData as any).length > 0 && (
+                                <>
+                                    <h2 className="font-semibold text-xl leading-[25px]">Results based on your search ({(peopleData as any).length})</h2>
+                                    {(peopleData as any).map((person: any) => (
+                                        <PeopleCard key={person.id} person={person} />
+                                    ))}
+                                </>
+                            )}
+
+                            {!isPendingPeople && peopleData && (peopleData as any).length === 0 && (
+                                <p className="text-center text-heyhao-secondary">No people found</p>
+                            )}
+
+                            {isPendingPeople && (
+                                <p className="text-center text-heyhao-secondary">Loading...</p>
+                            )}
+
+                            {errorPeople && (
+                                <p className="text-center text-heyhao-secondary">Error: {errorPeople.message}</p>
+                            )}
                         </div>
+
+                        <section id="Pagination" className="mx-auto mt-10">
+                            <ul className="flex items-center gap-4 justify-center">
+                                <div id="Step-Before" className="group nonactive shrink-0">
+                                    <button type="button" id="Step-Before-Active" className="group-[&.nonactive]:hidden group-[&.active]:block p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                        <img src="/assets/images/icons/arrow-left.svg" alt="icon" className="size-6 shrink-0" />
+                                    </button>
+                                    <button disabled type="button" id="Step-Before-Nonactive" className="group-[&.nonactive]:block group-[&.active]:hidden p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                        <img src="/assets/images/icons/arrow-left-nonactive.svg" alt="icon" className="size-6 shrink-0" />
+                                    </button>
+                                </div>
+                                <div id="Steps" className="flex items-center gap-4">
+                                    <li className="group active">
+                                        <Link to="">
+                                            <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
+                                                <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">1</p>
+                                            </div>
+                                        </Link>
+                                    </li>
+                                    <li className="group">
+                                        <Link to="">
+                                            <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
+                                                <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">2</p>
+                                            </div>
+                                        </Link>
+                                    </li>
+                                    <li className="group">
+                                        <Link to="">
+                                            <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
+                                                <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">3</p>
+                                            </div>
+                                        </Link>
+                                    </li>
+                                </div>
+                                <div id="Step-After" className="group active shrink-0">
+                                    <button type="button" id="Step-After-Active" className="group-[&.nonactive]:hidden group-[&.active]:block p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                        <img src="/assets/images/icons/arrow-left.svg" alt="icon" className="size-6 rotate-180" />
+                                    </button>
+                                    <button disabled type="button" id="Step-After-Nonactive" className="group-[&.nonactive]:block group-[&.active]:hidden p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
+                                        <img src="/assets/images/icons/arrow-left-nonactive.svg" alt="icon" className="size-6 rotate-180" />
+                                    </button>
+                                </div>
+                            </ul>
+                        </section>
                     </section>
                 )}
-
-                <section id="Pagination" className="mx-auto">
-                    <ul className="flex items-center gap-4">
-                        <div id="Step-Before" className="group nonactive shrink-0">
-                            <button type="button" id="Step-Before-Active" className="group-[&.nonactive]:hidden group-[&.active]:block p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
-                                <img src="/assets/images/icons/arrow-left.svg" alt="icon" className="size-6 shrink-0" />
-                            </button>
-                            <button disabled type="button" id="Step-Before-Nonactive" className="group-[&.nonactive]:block group-[&.active]:hidden p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
-                                <img src="/assets/images/icons/arrow-left-nonactive.svg" alt="icon" className="size-6 shrink-0" />
-                            </button>
-                        </div>
-                        <div id="Steps" className="flex items-center gap-4">
-                            <li className="group active">
-                                <Link to="">
-                                    <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                                        <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">1</p>
-                                    </div>
-                                </Link>
-                            </li>
-                            <li className="group">
-                                <Link to="">
-                                    <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                                        <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">2</p>
-                                    </div>
-                                </Link>
-                            </li>
-                            <li className="group">
-                                <Link to="">
-                                    <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                                        <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">3</p>
-                                    </div>
-                                </Link>
-                            </li>
-                        </div>
-                        <div id="Step-After" className="group active shrink-0">
-                            <button type="button" id="Step-After-Active" className="group-[&.nonactive]:hidden group-[&.active]:block p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
-                                <img src="/assets/images/icons/arrow-left.svg" alt="icon" className="size-6 rotate-180" />
-                            </button>
-                            <button disabled type="button" id="Step-After-Nonactive" className="group-[&.nonactive]:block group-[&.active]:hidden p-[10px] rounded-xl border border-heyhao-border bg-white shrink-0">
-                                <img src="/assets/images/icons/arrow-left-nonactive.svg" alt="icon" className="size-6 rotate-180" />
-                            </button>
-                        </div>
-                    </ul>
-                </section>
             </div>
         </main>
     );

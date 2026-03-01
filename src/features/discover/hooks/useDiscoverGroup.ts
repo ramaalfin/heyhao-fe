@@ -1,16 +1,17 @@
-import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { BaseResponse } from "../types/response";
-import { getDiscoverGroup, GetDiscoverGroupResponse } from "../api/getDiscoverGroup";
+import { useQuery } from "@tanstack/react-query";
+import { getDiscoverGroup } from "../api/getDiscoverGroup";
 
-export const useDiscoverGroup = () => {
-    const { mutateAsync, isPending, error } = useMutation<BaseResponse<GetDiscoverGroupResponse>, AxiosError<BaseResponse<GetDiscoverGroupResponse>>, string | null | undefined>({
-        mutationFn: (query) => getDiscoverGroup(query ?? undefined),
+export const useDiscoverGroup = (isEnabled: boolean = true, name?: string) => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["discover-group", name],
+        queryFn: () => getDiscoverGroup(name),
+        select: (data) => data.data,
+        enabled: isEnabled
     });
 
     return {
-        mutateAsync,
-        isPending,
+        data,
+        isLoading,
         error
     };
 };
