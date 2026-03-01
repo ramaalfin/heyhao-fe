@@ -9,6 +9,7 @@ import DiscoverPage from "./features/discover/pages/DiscoverPage";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
+import SuccessPayment from "./features/discover/pages/SuccessPayment";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -66,8 +67,13 @@ const router = createBrowserRouter([
         path: "/home/discover/group/:id",
         element: <DetailGroupPage />,
         loader: requireAuthLoader,
-      }
+      },
     ]
+  },
+  {
+    path: "/success-payment",
+    element: <SuccessPayment />,
+    loader: requireAuthLoader,
   }
 ]);
 

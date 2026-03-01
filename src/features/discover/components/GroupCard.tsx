@@ -10,8 +10,12 @@ export default function GroupCard({ group }: { group: GetDiscoverGroupResponse }
                     <img src={group.photo_url} alt="icon" className="size-full object-cover" />
                 </div>
                 <div className="hidden group-[&.vip]:flex items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full">
-                    <img src="/assets/images/icons/crown-blue-fill.svg" alt="icon" className="size-4 shrink-0" />
-                    <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">VIP</p>
+                    {group.type === "PAID" && (
+                        <img src="/assets/images/icons/crown-blue-fill.svg" alt="icon" className="size-4 shrink-0" />
+                    )}
+                    <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
+                        {group.type === "PAID" ? "VIP" : "FREE"}
+                    </p>
                 </div>
             </div>
             <div className="flex flex-col gap-1 relative z-10">

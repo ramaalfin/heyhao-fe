@@ -1,9 +1,48 @@
 import { useParams, Link } from "react-router";
 import { useDetailGroup } from "../hooks/useDetailGroup";
+import { useJoinFreeGroup } from "../hooks/useJoinFreeGroup";
+import { useCreateTransaction } from "../hooks/useCreateTransaction";
+import { toast } from "react-toastify";
 
 export default function DetailGroupPage() {
     const { id } = useParams<{ id: string }>();
+
     const { data: group, isLoading, error } = useDetailGroup(id || "");
+    const { mutateAsync: mutateJoinFree, isPending: isPendingFree } = useJoinFreeGroup();
+    const { mutateAsync: handleCreateTx, isPending: isPendingTransaction } = useCreateTransaction();
+
+    const handleJoinFreeGroup = async () => {
+        try {
+            const response = await mutateJoinFree(id || "");
+            if (response.data) {
+                toast(response.message || "Successfully joined group!", {
+                    type: "success",
+                });
+            }
+        } catch (error: any) {
+            toast(error?.response?.data?.message || "Failed to join group.", {
+                type: "error",
+            });
+        }
+    };
+
+    const handleJoinPaidGroup = async () => {
+        try {
+            const response = await handleCreateTx(id || "");
+            if (response.data?.redirect_url) {
+                toast(response.message || "Successfully joined group!", {
+                    type: "success",
+                });
+                /* Using window.location.href because midtrans redirect_url is an external sandbox URL, 
+                   not reachable via react-router's navigate */
+                window.location.href = response.data.redirect_url;
+            }
+        } catch (error: any) {
+            toast(error?.response?.data?.message || "Failed to create transaction.", {
+                type: "error",
+            });
+        }
+    };
 
     if (isLoading) {
         return (
@@ -233,7 +272,9 @@ export default function DetailGroupPage() {
                                             </div>
                                         </div>
                                     </section>
-                                    <button type="button" className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center">Pay With Midtrains & Join</button>
+                                    <button onClick={handleJoinPaidGroup} disabled={isPendingTransaction} type="button" className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center">
+                                        {isPendingTransaction ? "Processing..." : "Pay With Midtrains & Join"}
+                                    </button>
                                 </div>
                             </form>
                         ) : (
@@ -253,7 +294,9 @@ export default function DetailGroupPage() {
                                         </div>
                                     </section>
                                     <hr className="border-heyhao-border" />
-                                    <button type="button" className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center">Join Group for Free</button>
+                                    <button onClick={handleJoinFreeGroup} disabled={isPendingFree} type="button" className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center">
+                                        {isPendingFree ? "Joining..." : "Join Group for Free"}
+                                    </button>
                                 </div>
                             </form>
                         )}
