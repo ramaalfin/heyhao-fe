@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { UpdatePasswordValues } from "../utils/schema";
-import instanceApi from "../../../shared/utils/axios";
+import { instanceApi } from "../../../shared/utils/axios";
 import { BaseResponse } from "../types/response";
 
 export const updatePasswordSchema = z.object({

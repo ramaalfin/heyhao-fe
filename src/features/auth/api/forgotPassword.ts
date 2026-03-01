@@ -1,5 +1,5 @@
 import { z } from "zod";
-import instanceApi from "../../../shared/utils/axios";
+import { instanceApi } from "../../../shared/utils/axios";
 import { BaseResponse } from "../types/response";
 import { ForgotPasswordValues } from "../utils/schema";
 
