@@ -14,44 +14,44 @@ export default function CarouselImage() {
           <div className="flex flex-col w-95 gap-2.5">
             <div className="slider w-95">
               <div className="slide-top flex flex-col gap-2.5">
-                <img src="assets/images/thumbnails/auth-1.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-2.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-3.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-1.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-2.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-3.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-1.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-2.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-3.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-1.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-2.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-3.png" alt="image" />
               </div>
             </div>
             <div className="slider w-95">
               <div className="slide-top flex flex-col gap-2.5">
-                <img src="assets/images/thumbnails/auth-1.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-2.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-3.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-1.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-2.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-3.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-1.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-2.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-3.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-1.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-2.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-3.png" alt="image" />
               </div>
             </div>
           </div>
           <div className="flex flex-col w-68.75 gap-2.5">
             <div className="slider w-68.75">
               <div className="slide-bottom flex flex-col gap-2.5">
-                <img src="assets/images/thumbnails/auth-4.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-5.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-6.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-4.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-5.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-6.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-4.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-5.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-6.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-4.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-5.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-6.png" alt="image" />
               </div>
             </div>
             <div className="slider w-68.75">
               <div className="slide-bottom flex flex-col gap-2.5">
-                <img src="assets/images/thumbnails/auth-4.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-5.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-6.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-4.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-5.png" alt="image" />
-                <img src="assets/images/thumbnails/auth-6.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-4.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-5.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-6.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-4.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-5.png" alt="image" />
+                <img src="/assets/images/thumbnails/auth-6.png" alt="image" />
               </div>
             </div>
           </div>
