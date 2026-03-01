@@ -75,7 +75,7 @@ export default function SignUpPage() {
         <div className="flex w-108.75 h-fit shrink-0 flex-col gap-10 z-20 relative">
           <section id="CompanyLogo">
             <img
-              src="assets/images/logos/heyhao.svg"
+              src="/assets/images/logos/heyhao.svg"
               alt="icon"
               className="w-44.5 h-9.5 shrink-0 mx-auto"
             />
@@ -123,7 +123,7 @@ export default function SignUpPage() {
                     className="flex items-center gap-1.5 px-6 py-3.5 rounded-full bg-heyhao-black"
                   >
                     <img
-                      src="assets/images/icons/edit-2-white-fill.svg"
+                      src="/assets/images/icons/edit-2-white-fill.svg"
                       alt="icon"
                       className="size-6 shrink-0"
                     />
@@ -152,7 +152,7 @@ export default function SignUpPage() {
                       className="peer absolute bottom-0 left-0 right-0 top-0 w-full h-full bg-transparent font-semibold leading-5 focus:outline-none pb-4 pl-20 pt-9"
                     />
                     <img
-                      src="assets/images/icons/user-square-grey.svg"
+                      src="/assets/images/icons/user-square-grey.svg"
                       alt="icon"
                       className="absolute left-6 top-1/2 size-6 shrink-0 -translate-y-1/2 peer-focus:z-30 z-30 peer-placeholder-shown:z-0"
                     />
@@ -182,7 +182,7 @@ export default function SignUpPage() {
                         className="peer absolute bottom-0 left-0 right-0 top-0 w-full h-full bg-transparent font-semibold leading-5 focus:outline-none pb-4 pl-20 pt-9 z-10"
                       />
                       <img
-                        src="assets/images/icons/sms-grey.svg"
+                        src="/assets/images/icons/sms-grey.svg"
                         alt="icon"
                         className="absolute left-6 top-1/2 size-6 shrink-0 -translate-y-1/2 peer-focus:z-30 z-30 peer-placeholder-shown:z-0"
                       />
@@ -196,7 +196,7 @@ export default function SignUpPage() {
                     </div>
                     {/* <img
                     id="EmailNotUsed"
-                    src="assets/images/icons/checklist-green-fill.svg"
+                    src="/assets/images/icons/checklist-green-fill.svg"
                     alt="icon"
                     className="absolute z-40 right-6 top-1/2 size-6 shrink-0 -translate-y-1/2"
                   />
@@ -205,12 +205,12 @@ export default function SignUpPage() {
                     className="absolute -right-2.5 top-6 flex flex-col items-center gap-px peer-focus:z-30 z-30 peer-placeholder-shown:z-0"
                   >
                     <img
-                      src="assets/images/icons/checklist-red-fill.svg"
+                      src="/assets/images/icons/checklist-red-fill.svg"
                       alt="icon"
                       className="size-6 shrink-0"
                     />
                     <img
-                      src="assets/images/icons/polygon-red-fill.svg"
+                      src="/assets/images/icons/polygon-red-fill.svg"
                       alt="icon"
                       className="w-3.75 h-4.5 shrink-0"
                     />
@@ -234,12 +234,12 @@ export default function SignUpPage() {
                         className="show-password absolute right-6 transform -translate-y-1/2 top-1/2 z-30"
                       >
                         <img
-                          src="assets/images/icons/eye-grey.svg"
+                          src="/assets/images/icons/eye-grey.svg"
                           alt="Hide password icon"
                           className="show-icon size-6 shrink-0"
                         />
                         <img
-                          src="assets/images/icons/eye-slash-black.svg"
+                          src="/assets/images/icons/eye-slash-black.svg"
                           alt="Show password icon"
                           className="hide-icon size-6 shrink-0 hidden"
                         />
@@ -253,7 +253,7 @@ export default function SignUpPage() {
                       />
                       <div className="w-[1.5px] h-6 bg-heyhao-border absolute left-16 peer-focus:z-30 z-30 peer-placeholder-shown:z-0"></div>
                       <img
-                        src="assets/images/icons/lock-grey.svg"
+                        src="/assets/images/icons/lock-grey.svg"
                         alt="Lock icon"
                         className="absolute left-6 top-1/2 size-6 shrink-0 -translate-y-1/2 peer-focus:z-30 z-30 peer-placeholder-shown:z-0"
                       />

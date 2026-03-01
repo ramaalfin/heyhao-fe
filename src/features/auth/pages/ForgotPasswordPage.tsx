@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
                 <section id="BackgroundInputs" className="fixed bg-white rounded-l-[24px] top-0 right-0 bottom-0 left-[685px]"></section>
                 <div className="flex w-[435px] h-fit shrink-0 flex-col gap-[40px] relative z-20">
                     <section id="CompanyLogo">
-                        <img src="assets/images/logos/heyhao.svg" alt="icon" className="w-[178px] h-[38px] shrink-0 mx-auto" />
+                        <img src="/assets/images/logos/heyhao.svg" alt="icon" className="w-[178px] h-[38px] shrink-0 mx-auto" />
                     </section>
                     <form
                         onSubmit={handleSubmit(onSubmit)}
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
                                             {...register("email")}
                                         />
                                         <div className="w-[1.5px] h-6 bg-heyhao-border absolute left-[64px] peer-focus:z-30 z-30 peer-placeholder-shown:z-0"></div>
-                                        <img src="assets/images/icons/sms-grey.svg" alt="icon" className="absolute left-[24px] top-1/2 size-[24px] shrink-0 -translate-y-1/2 peer-focus:z-30 z-30 peer-placeholder-shown:z-0" />
+                                        <img src="/assets/images/icons/sms-grey.svg" alt="icon" className="absolute left-[24px] top-1/2 size-[24px] shrink-0 -translate-y-1/2 peer-focus:z-30 z-30 peer-placeholder-shown:z-0" />
                                         <label htmlFor="Email" className="absolute left-[80px] text-heyhao-secondary transition-all duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 leading-[20px] font-medium top-4 peer-focus:top-4 -translate-y-0 peer-focus:-translate-y-0 peer-focus:z-30 z-30 peer-placeholder-shown:z-0">Email Address</label>
                                     </div>
                                     {errors?.email && (
