@@ -10,6 +10,7 @@ import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPayment from "./features/discover/pages/SuccessPayment";
+import ChatPage from "./features/chat/pages/ChatPage";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -68,13 +69,18 @@ const router = createBrowserRouter([
         element: <DetailGroupPage />,
         loader: requireAuthLoader,
       },
-    ]
+      {
+        path: "/home/chat",
+        element: <ChatPage />,
+        loader: requireAuthLoader,
+      },
+    ],
   },
   {
     path: "/success-payment",
     element: <SuccessPayment />,
     loader: requireAuthLoader,
-  }
+  },
 ]);
 
 export default router;
