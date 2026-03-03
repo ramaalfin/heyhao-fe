@@ -1,12 +1,57 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import secureLocalStorage from "react-secure-storage";
+import { AUTH_KEY } from "../../../shared/utils/constant";
+import { RoomResponseValues } from "../schema/getRoomSchema";
+import { SignInResponse } from "../../auth/api/signIn";
+import { useGetRooms } from "../hooks/useGetRooms";
+import dayjs from "dayjs";
 
 export default function ChatPage() {
+  const auth = secureLocalStorage.getItem(AUTH_KEY) as SignInResponse;
+
   const [searchValue, setSearchValue] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const isSearching = searchValue.trim().length > 0;
+
+  const { rooms } = useGetRooms();
+
+  const getProfile = useCallback((chat: RoomResponseValues) => {
+    if (chat.is_group) {
+      return {
+        name: chat.group?.name,
+        photo_url: chat.group?.photo_url,
+        message:
+          chat.messages.length > 0
+            ? {
+                content: chat.messages[0].content,
+                created_at: chat.messages[0].created_at,
+                type: chat.messages[0].type,
+                sender: chat.messages[0].user,
+              }
+            : null,
+      };
+    }
+
+    const profileMember = chat.members.find(
+      (member) => member.user.id !== auth.id,
+    );
+    return {
+      name: profileMember?.user.name,
+      photo_url: profileMember?.user.photo_url,
+      message:
+        chat.messages.length > 0
+          ? {
+              content: chat.messages[0].content,
+              created_at: chat.messages[0].created_at,
+              type: chat.messages[0].type,
+              sender: chat.messages[0].user,
+            }
+          : null,
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -139,81 +184,63 @@ export default function ChatPage() {
                       className="flex h-full w-full overflow-y-scroll hide-scrollbar"
                     >
                       <div className="flex flex-col w-full gap-1">
-                        <Link
-                          to="/message-room-chat-people"
-                          className="chats-card group last:pb-8"
-                        >
-                          <div className="flex items-center rounded-2xl p-4 gap-3 group-[.active]:bg-heyhao-card-grey hover:bg-heyhao-card-grey transition-all duration-300">
-                            <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden border border-heyhao-border">
-                              <img
-                                src="/assets/images/photos/photo-1.png"
-                                className="w-full h-full object-cover"
-                                alt="photo"
-                              />
-                            </div>
-                            <div className="flex flex-col w-full gap-1">
-                              <div className="flex items-center justify-between gap-[6px]">
-                                <p className="font-medium leading-5 max-w-[182px] truncate">
-                                  Masayoshi
-                                </p>
-                                <span className="text-xs text-heyhao-secondary">
-                                  Now
-                                </span>
+                        {rooms?.map((room) => (
+                          <Link
+                            key={room.id}
+                            to="#"
+                            className="chats-card group last:pb-8"
+                          >
+                            <div className="flex items-center rounded-2xl p-4 gap-3 group-[.active]:bg-heyhao-card-grey hover:bg-heyhao-card-grey transition-all duration-300">
+                              <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden border border-heyhao-border">
+                                <img
+                                  src={getProfile(room).photo_url || ""}
+                                  className="w-full h-full object-cover"
+                                  alt="photo"
+                                />
                               </div>
-                              <div className="flex items-center gap-1 justify-between">
-                                <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
-                                  <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
-                                    <span className="truncate">
-                                      {" "}
-                                      Sama-sama bro, thanks juga udah join{" "}
-                                    </span>
+                              <div className="flex flex-col w-full gap-1">
+                                <div className="flex items-center justify-between gap-[6px]">
+                                  <p className="font-medium leading-5 max-w-[182px] truncate">
+                                    {getProfile(room).name || ""}
                                   </p>
-                                  <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
-                                    Maiden is typing...
-                                  </p>
+                                  <span className="text-xs text-heyhao-secondary">
+                                    {dayjs().isSame(
+                                      getProfile(room).message?.created_at,
+                                      "minute",
+                                    )
+                                      ? "Now"
+                                      : dayjs(
+                                          getProfile(room).message?.created_at,
+                                        ).format("D MMM")}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 justify-between">
+                                  <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
+                                    <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
+                                      <span className="truncate">
+                                        {room.messages.length > 0 && (
+                                          <span className="truncate">
+                                            {room.is_group
+                                              ? `${getProfile(room).message?.sender?.name}: ${
+                                                  getProfile(room).message
+                                                    ?.content
+                                                }`
+                                              : `${getProfile(room).message?.content}`}
+                                          </span>
+                                        )}
+                                      </span>
+                                    </p>
+                                    <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
+                                      {getProfile(room).message?.sender?.name ||
+                                        ""}
+                                      is typing...
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </Link>
-                        <Link
-                          to="/message-room-chat-group"
-                          className="chats-card group last:pb-8"
-                        >
-                          <div className="flex items-center rounded-2xl p-4 gap-3 group-[.active]:bg-heyhao-card-grey hover:bg-heyhao-card-grey transition-all duration-300">
-                            <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden border border-heyhao-border">
-                              <img
-                                src="/assets/images/photos/bwa.svg"
-                                className="w-full h-full object-cover"
-                                alt="photo"
-                              />
-                            </div>
-                            <div className="flex flex-col w-full gap-1">
-                              <div className="flex items-center justify-between gap-[6px]">
-                                <p className="font-medium leading-5 max-w-[182px] truncate">
-                                  Laravel PHP Indonesia
-                                </p>
-                                <span className="text-xs text-heyhao-secondary">
-                                  12:12
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-1 justify-between">
-                                <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
-                                  <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
-                                    <span className="truncate">
-                                      {" "}
-                                      Alex: Itu redirect() ngapain ya abis
-                                      pesenan berhasil{" "}
-                                    </span>
-                                  </p>
-                                  <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
-                                    Maiden is typing...
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
+                          </Link>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -254,9 +281,8 @@ export default function ChatPage() {
                                 <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
                                   <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
                                     <span className="truncate">
-                                      {" "}
                                       Alex: Itu redirect() ngapain ya abis
-                                      pesenan berhasil{" "}
+                                      pesenan berhasil
                                     </span>
                                   </p>
                                   <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
@@ -297,9 +323,8 @@ export default function ChatPage() {
                                       alt="icon"
                                     />
                                     <span className="truncate">
-                                      {" "}
                                       Rierru: Cara fix problem seperti ini
-                                      gimana ya?{" "}
+                                      gimana ya?
                                     </span>
                                   </p>
                                   <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
@@ -350,8 +375,7 @@ export default function ChatPage() {
                                 <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
                                   <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
                                     <span className="truncate">
-                                      {" "}
-                                      Sama-sama bro, thanks juga udah join{" "}
+                                      Sama-sama bro, thanks juga udah join
                                     </span>
                                   </p>
                                   <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
@@ -387,8 +411,7 @@ export default function ChatPage() {
                                 <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
                                   <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
                                     <span className="truncate">
-                                      {" "}
-                                      Jangan lupa jam 12:30 ya{" "}
+                                      Jangan lupa jam 12:30 ya
                                     </span>
                                   </p>
                                   <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
@@ -427,8 +450,7 @@ export default function ChatPage() {
                                 <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
                                   <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:hidden!">
                                     <span className="truncate">
-                                      {" "}
-                                      Jangan lupa jam 12:30 ya{" "}
+                                      Jangan lupa jam 12:30 ya
                                     </span>
                                   </p>
                                   <p className="hidden group-[.typing]:flex! text-heyhao-blue truncate">
@@ -640,6 +662,6 @@ export default function ChatPage() {
           </div>
         </div>
       )}
-    </React.Fragment >
+    </React.Fragment>
   );
 }
