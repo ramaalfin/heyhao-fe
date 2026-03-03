@@ -3,6 +3,7 @@ import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "../../../shared/utils/constant";
 import { SignInResponse } from "../../auth/api/signIn";
 import dayjs from "dayjs";
+import FormSendMessage from "./FormSendMessage";
 
 interface ActiveRoomProps {
   roomId: string;
@@ -300,36 +301,7 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
           </article>
 
           <div className="relative flex w-full z-30">
-            <form className="absolute bottom-0 w-full max-w-full p-5 gap-[10px] z-20">
-              <div className="relative">
-                <div
-                  id="Chat-Input"
-                  contentEditable="true"
-                  spellCheck="false"
-                  className="appearance-none outline-none w-full min-h-[60px] max-h-[200px] h-fit rounded-2xl p-5 pl-4 pr-[112px] bg-white break-words font-medium leading-5 hide-scrollbar focus:ring-2 focus:ring-heyhao-blue transition-all duration-300 empty:text-heyhao-secondary empty:before:content-['Type_a_message...'] text-heyhao-black shadow-sm"
-                ></div>
-                <div className="absolute flex right-2 bottom-2 gap-2">
-                  <button
-                    type="button"
-                    id="Upload-Image"
-                    className="size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 ring-heyhao-border hover:ring-1 hover:ring-heyhao-blue transition-all duration-300"
-                  >
-                    <img
-                      src="/assets/images/icons/gallery-import.svg"
-                      className="size-6"
-                      alt="icon"
-                    />
-                  </button>
-                  <button type="button" className="flex shrink-0 w-11">
-                    <img
-                      src="/assets/images/icons/Send-Button-blue-bg.svg"
-                      className="object-contain"
-                      alt="icon"
-                    />
-                  </button>
-                </div>
-              </div>
-            </form>
+            <FormSendMessage roomId={roomId} />
           </div>
         </div>
       </div>
