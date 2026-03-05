@@ -5,7 +5,7 @@ import { SendMessagePayload } from "../schema/sendMessageSchema";
 export const useSendMessage = (roomId: string) => {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending, error } = useMutation({
+  const { mutateAsync, isPending, error } = useMutation({
     mutationFn: (payload: SendMessagePayload) => sendMessage(payload),
     onSuccess: () => {
       // Invalidate the room detail query so messages re-fetch
@@ -14,7 +14,7 @@ export const useSendMessage = (roomId: string) => {
   });
 
   return {
-    sendMessage: mutate,
+    sendMessage: mutateAsync,
     isPending,
     error,
   };
