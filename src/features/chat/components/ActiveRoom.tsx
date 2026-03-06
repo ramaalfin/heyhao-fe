@@ -7,6 +7,7 @@ import FormSendMessage from "./FormSendMessage";
 import { useEffect, useState } from "react";
 import { pusher } from "../utils/pusher";
 import GroupInfoModal from "./GroupInfoModal";
+import GalleryModal from "./GalleryModal";
 
 interface ActiveRoomProps {
   roomId: string;
@@ -16,6 +17,8 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
   const { roomDetail, isLoading, error } = useGetRoomDetail(roomId);
   const auth = secureLocalStorage.getItem(AUTH_KEY) as SignInResponse;
   const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!roomDetail) {
@@ -289,7 +292,13 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                             </div>
 
                             {msg.type === "IMAGE" && msg.content_url && (
-                              <div className="message-card preview-img relative max-w-[584px]">
+                              <button
+                                onClick={() => {
+                                  setIsGalleryOpen(true);
+                                  setSelectedImage(msg.content_url || "");
+                                }}
+                                className="message-card preview-img relative max-w-[584px]"
+                              >
                                 <img
                                   src={msg.content_url}
                                   className={`image max-w-[353px] max-h-[214px] overflow-hidden rounded-2xl object-contain ${
@@ -299,7 +308,7 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                                   }`}
                                   alt="image"
                                 />
-                              </div>
+                              </button>
                             )}
 
                             {msg.type !== "IMAGE" && (
@@ -335,6 +344,13 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
         <GroupInfoModal
           onClose={() => setIsGroupInfoOpen(false)}
           data={roomDetail}
+        />
+      )}
+
+      {isGalleryOpen && selectedImage && (
+        <GalleryModal
+          onClose={() => setIsGalleryOpen(false)}
+          image={selectedImage}
         />
       )}
     </>
