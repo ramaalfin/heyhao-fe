@@ -4,6 +4,8 @@ import { AUTH_KEY } from "../../../shared/utils/constant";
 import { SignInResponse } from "../../auth/api/signIn";
 import dayjs from "dayjs";
 import FormSendMessage from "./FormSendMessage";
+import { useEffect } from "react";
+import { pusher } from "../utils/pusher";
 
 interface ActiveRoomProps {
   roomId: string;
@@ -12,6 +14,25 @@ interface ActiveRoomProps {
 export default function ActiveRoom({ roomId }: ActiveRoomProps) {
   const { roomDetail, isLoading, error } = useGetRoomDetail(roomId);
   const auth = secureLocalStorage.getItem(AUTH_KEY) as SignInResponse;
+
+  // ✅ Must be called unconditionally BEFORE any early returns
+  useEffect(() => {
+    if (!roomDetail) {
+      return;
+    }
+
+    const channelName = `chat-room-${roomDetail.id}`;
+    const eventName = `chat-room-${roomDetail.id}-event`;
+
+    const channel = pusher.subscribe(channelName);
+    channel.bind(eventName, (data: any) => {
+      console.log(data);
+    });
+
+    return () => {
+      pusher.unsubscribe(channelName);
+    };
+  }, [roomDetail]);
 
   if (isLoading) {
     return (
@@ -46,7 +67,7 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
     return {
       name: otherMember?.user.name || "User",
       photoUrl: otherMember?.user.photo_url || "",
-      status: "Online", // Or use a real status if available
+      status: "Online",
       statusColor: "text-heyhao-green",
       statusBg: "bg-heyhao-green",
     };
@@ -54,11 +75,6 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
 
   const header = getRoomHeader();
 
-  // Group messages by date (e.g., "Yesterday, 18 Dec", "Today, 19 Dec")
-  // For simplicity here, we'll just render them as a list, and optional date header
-  // Note: the template groups by Date.
-
-  // To group by date:
   const groupedMessages: { [key: string]: typeof roomDetail.messages } = {};
   roomDetail.messages.forEach((msg) => {
     const dateKey = dayjs(msg.created_at).format("YYYY-MM-DD");
@@ -280,17 +296,19 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                             </div>
                           )}
 
-                          <div className="message-card relative max-w-[584px]">
-                            <div
-                              className={`w-fit rounded-3xl py-5 px-4 gap-2 leading-[28px] ${
-                                isOut
-                                  ? "rounded-tr-none bg-white"
-                                  : "rounded-tl-none bg-white"
-                              }`}
-                            >
-                              <p>{msg.content}</p>
+                          {msg.type !== "IMAGE" && (
+                            <div className="message-card relative max-w-[584px]">
+                              <div
+                                className={`w-fit rounded-3xl py-5 px-4 gap-2 leading-[28px] ${
+                                  isOut
+                                    ? "rounded-tr-none bg-white"
+                                    : "rounded-tl-none bg-white"
+                                }`}
+                              >
+                                <p>{msg.content}</p>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                     );

@@ -247,10 +247,13 @@ export default function ChatPage() {
                                               {room.is_group
                                                 ? `${getProfile(room).message?.sender?.name}: ${
                                                     getProfile(room).message
-                                                      ?.content ||
-                                                    "Sent an attachment"
+                                                      ?.type === "IMAGE"
+                                                      ? "Sent an attachment"
+                                                      : getProfile(room).message
+                                                          ?.content ||
+                                                        "Sent an attachment"
                                                   }`
-                                                : `${getProfile(room).message?.content || "Sent an attachment"}`}
+                                                : `${getProfile(room).message?.type === "IMAGE" ? "Sent an attachment" : getProfile(room).message?.content || "Sent an attachment"}`}
                                             </span>
                                           )}
                                         </span>
