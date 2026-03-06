@@ -46,6 +46,7 @@ export const getRoomDetailSchema = z.object({
           id: z.string(),
           group_id: z.string(),
           filename: z.string(),
+          file_url: z.string(),
         }),
       ),
       benefit: z.array(z.string()),
