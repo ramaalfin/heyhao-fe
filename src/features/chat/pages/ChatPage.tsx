@@ -114,7 +114,7 @@ export default function ChatPage() {
               id="Menu"
               className="flex flex-col flex-1 p-5 pb-0 gap-5 overflow-hidden"
             >
-              <Link to="/discover">
+              <Link to="/home/discover">
                 <div className="relative flex items-center rounded-2xl ring-1 ring-heyhao-border overflow-hidden hover:ring-1 hover:ring-heyhao-blue transition-all duration-300">
                   <img
                     src="/assets/images/backgrounds/discover-group-bg.png"
