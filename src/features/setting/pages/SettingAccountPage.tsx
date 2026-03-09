@@ -2,9 +2,16 @@ import secureLocalStorage from "react-secure-storage";
 import SidebarMenu from "../components/SidebarMenu";
 import { AUTH_KEY } from "../../../shared/utils/constant";
 import { SignUpResponse } from "../../auth/api/signUp";
+import { useNavigate } from "react-router";
 
 export default function SettingAccountPage() {
+  const navigate = useNavigate()
   const auth = secureLocalStorage.getItem(AUTH_KEY) as SignUpResponse;
+
+  const handleLogout = () => {
+    secureLocalStorage.removeItem(AUTH_KEY);
+    navigate("/sign-in");
+  };
 
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
@@ -141,16 +148,16 @@ export default function SettingAccountPage() {
                 </div>
               </section>
               <section id="Buttons" className="flex flex-col gap-[12px]">
-                <a href="">
+                <button onClick={() => navigate("/home/setting/update-profile")}>
                   <div className="bg-heyhao-blue rounded-full justify-center flex py-4 text-white w-full font-bold leading-[20px]">
                     Update Profile
                   </div>
-                </a>
-                <a href="">
-                  <div className="bg-[#ED6B6017] rounded-full justify-center flex py-4 text-heyhao-coral w-full font-bold leading-[20px]">
+                </button>
+                <button onClick={handleLogout}>
+                  <div className="bg-[#ED6B6017] rounded-full justify-center flex py-4 text-heyhao-coral w-full font-bold leading-[20px] cursor-pointer">
                     Log Out
                   </div>
-                </a>
+                </button>
               </section>
             </div>
           </div>
