@@ -36,7 +36,7 @@ export default function DiscoverPage() {
     >
       <section
         id="Nav-Top"
-        className="relative w-full p-[30px] bg-[linear-gradient(93.23deg,_#FFFFFF_0%,_#EFF2F7_90%)] flex flex-col gap-[30px] border-b border-heyhao-border"
+        className="relative w-full p-[30px] bg-[linear-gradient(93.23deg,#FFFFFF_0%,#EFF2F7_90%)] flex flex-col gap-[30px] border-b border-heyhao-border"
       >
         <img
           src="/assets/images/backgrounds/ornament-discover-left.png"

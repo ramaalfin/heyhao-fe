@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { pusher } from "../utils/pusher";
 import GroupInfoModal from "./GroupInfoModal";
 import GalleryModal from "./GalleryModal";
+import PersonalInfoModal from "./PersonalInfoModal";
 
 interface ActiveRoomProps {
   roomId: string;
@@ -17,6 +18,7 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
   const { roomDetail, isLoading, error } = useGetRoomDetail(roomId);
   const auth = secureLocalStorage.getItem(AUTH_KEY) as SignInResponse;
   const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
+  const [isPersonalInfoOpen, setIsPersonalInfoOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -180,7 +182,13 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
               </li>
               <li className="group">
                 <button
-                  onClick={() => setIsGroupInfoOpen(true)}
+                  onClick={() => {
+                    if (roomDetail?.group) {
+                      setIsGroupInfoOpen(true);
+                    } else {
+                      setIsPersonalInfoOpen(true);
+                    }
+                  }}
                   id="Info"
                   className="size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 ring-heyhao-border hover:ring-1 hover:ring-heyhao-blue transition-all duration-300"
                 >
@@ -344,6 +352,16 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
         <GroupInfoModal
           onClose={() => setIsGroupInfoOpen(false)}
           data={roomDetail}
+        />
+      )}
+
+      {isPersonalInfoOpen && (
+        <PersonalInfoModal
+          onClose={() => setIsPersonalInfoOpen(false)}
+          userId={
+            roomDetail?.members.find((m) => m.user.id !== auth?.id)?.user.id ||
+            ""
+          }
         />
       )}
 
