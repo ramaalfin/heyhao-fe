@@ -5,8 +5,6 @@ import { useGetOwnGroups } from "../hooks/useGetOwnGroups";
 export default function SettingGroupPage() {
   const { ownGroups, isLoading } = useGetOwnGroups();
 
-  console.log("ownGroups", ownGroups);
-
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
       <SidebarMenu />
@@ -185,7 +183,7 @@ export default function SettingGroupPage() {
                           </td>
                           <td className="w-full min-w-[130px] pl-[10px]">
                             <Link
-                              to={`/home/setting/group-manage-${group.type.toLowerCase()}`}
+                              to={`/home/setting/groups/${group?.id}`}
                               className="flex w-fit max-w-max"
                             >
                               <div className="px-[32px] py-4 bg-heyhao-black rounded-full w-fit max-w-max">
