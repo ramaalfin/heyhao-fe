@@ -1,7 +1,12 @@
 import { Link } from "react-router";
 import SidebarMenu from "../components/SidebarMenu";
+import { useGetOwnGroups } from "../hooks/useGetOwnGroups";
 
 export default function SettingGroupPage() {
+  const { ownGroups, isLoading } = useGetOwnGroups();
+
+  console.log("ownGroups", ownGroups);
+
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
       <SidebarMenu />
@@ -42,7 +47,7 @@ export default function SettingGroupPage() {
                     </h4>
                   </div>
                   <strong className="font-bold text-[32px] leading-[40px]">
-                    200.450
+                    {isLoading ? "..." : ownGroups?.total_members || 0}
                   </strong>
                 </div>
                 <div className="card flex flex-col gap-2 p-6 bg-white rounded-2xl">
@@ -59,7 +64,7 @@ export default function SettingGroupPage() {
                     </h4>
                   </div>
                   <strong className="font-bold text-[32px] leading-[40px]">
-                    192
+                    {isLoading ? "..." : ownGroups?.paid_groups || 0}
                   </strong>
                 </div>
                 <div className="card flex flex-col gap-2 p-6 bg-white rounded-2xl">
@@ -76,7 +81,7 @@ export default function SettingGroupPage() {
                     </h4>
                   </div>
                   <strong className="font-bold text-[32px] leading-[40px]">
-                    321
+                    {isLoading ? "..." : ownGroups?.free_groups || 0}
                   </strong>
                 </div>
               </section>
@@ -96,74 +101,103 @@ export default function SettingGroupPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="flex items-center border-b border-heyhao-border mt-6 pb-6 mx-6">
-                      <td className="w-full min-w-[420px]">
-                        <div className="flex items-center gap-[12px]">
-                          <div className="flex justify-center items-center size-[64px] shrink-0 rounded-full overflow-hidden">
-                            <img
-                              src="/assets/images/thumbnails/featured-2.png"
-                              alt="image"
-                              className="size-full object-cover"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1 relative z-10">
-                            <h3 className="line-clamp-1 font-semibold text-lg leading-[22.5px]">
-                              Indonesia Laravel Creatives
-                            </h3>
-                            <div className="flex items-center gap-1">
+                    {isLoading ? (
+                      <tr className="flex items-center justify-center mt-6 pb-6 mx-6">
+                        <td className="text-heyhao-secondary">
+                          Loading your groups...
+                        </td>
+                      </tr>
+                    ) : ownGroups?.lists.length === 0 ? (
+                      <tr className="flex items-center justify-center mt-6 pb-6 mx-6">
+                        <td className="text-heyhao-secondary">
+                          No groups found.
+                        </td>
+                      </tr>
+                    ) : (
+                      ownGroups?.lists.map((group) => (
+                        <tr
+                          key={group.id}
+                          className="flex items-center border-b border-heyhao-border mt-6 pb-6 mx-6 last:border-0 last:pb-6"
+                        >
+                          <td className="w-full min-w-[420px]">
+                            <div className="flex items-center gap-[12px]">
+                              <div className="flex justify-center items-center size-[64px] shrink-0 rounded-full overflow-hidden bg-heyhao-grey">
+                                {group.photo_url ? (
+                                  <img
+                                    src={group.photo_url}
+                                    alt="image"
+                                    className="size-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-heyhao-grey flex items-center justify-center text-heyhao-blue text-xl font-semibold">
+                                    {group.name.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-1 relative z-10">
+                                <h3 className="line-clamp-1 font-semibold text-lg leading-[22.5px]">
+                                  {group.name}
+                                </h3>
+                                <div className="flex items-center gap-1">
+                                  <img
+                                    src="/assets/images/icons/profile-2user-green.svg"
+                                    alt="icon"
+                                    className="size-4 shrink-0"
+                                  />
+                                  <div className="flex gap-1">
+                                    <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
+                                      {group.total_members}
+                                    </p>
+                                    <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
+                                      Members
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td
+                            className={`group ${
+                              group.type === "PAID" ? "vip" : "free"
+                            } w-full min-w-[204px] pl-6`}
+                          >
+                            <div
+                              id="Vip"
+                              className="group-[&.vip]:flex group-[&.free]:hidden shrink-0 items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full w-fit max-w-max"
+                            >
                               <img
-                                src="/assets/images/icons/profile-2user-green.svg"
+                                src="/assets/images/icons/crown-blue-fill.svg"
                                 alt="icon"
                                 className="size-4 shrink-0"
                               />
-                              <div className="flex gap-1">
-                                <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
-                                  22.259
-                                </p>
-                                <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
-                                  Members
+                              <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
+                                VIP
+                              </p>
+                            </div>
+                            <div
+                              id="Free"
+                              className="group-[&.vip]:hidden group-[&.free]:flex shrink-0 items-center gap-[2px] py-[6px] px-[15.5px] bg-heyhao-grey rounded-full w-fit max-w-max"
+                            >
+                              <p className="font-bold text-sm leading-[17.5px] text-heyhao-secondary">
+                                Free
+                              </p>
+                            </div>
+                          </td>
+                          <td className="w-full min-w-[130px] pl-[10px]">
+                            <Link
+                              to={`/home/setting/group-manage-${group.type.toLowerCase()}`}
+                              className="flex w-fit max-w-max"
+                            >
+                              <div className="px-[32px] py-4 bg-heyhao-black rounded-full w-fit max-w-max">
+                                <p className="text-white font-bold leading-5">
+                                  Manage
                                 </p>
                               </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="group vip w-full min-w-[204px] pl-6">
-                        <div
-                          id="Vip"
-                          className="group-[&.vip]:flex group-[&.free]:hidden shrink-0 items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full w-fit!"
-                        >
-                          <img
-                            src="/assets/images/icons/crown-blue-fill.svg"
-                            alt="icon"
-                            className="size-4 shrink-0"
-                          />
-                          <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                            VIP
-                          </p>
-                        </div>
-                        <div
-                          id="Free"
-                          className="group-[&.vip]:hidden group-[&.free]:flex shrink-0 items-center gap-[2px] py-[6px] px-[15.5px] bg-heyhao-grey rounded-full w-fit!"
-                        >
-                          <p className="font-bold text-sm leading-[17.5px] text-heyhao-secondary">
-                            Free
-                          </p>
-                        </div>
-                      </td>
-                      <td className="w-full min-w-[130px] pl-[10px]">
-                        <Link
-                          to="/home/setting/group-manage-vip"
-                          className="flexw-fit!"
-                        >
-                          <div className="px-[32px] py-4 bg-heyhao-black rounded-full w-fit!">
-                            <p className="text-white font-bold leading-5">
-                              Manage
-                            </p>
-                          </div>
-                        </Link>
-                      </td>
-                    </tr>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </section>
@@ -200,42 +234,6 @@ export default function SettingGroupPage() {
                         <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
                           <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">
                             1
-                          </p>
-                        </div>
-                      </Link>
-                    </li>
-                    <li className="group">
-                      <Link to="/home/setting/#">
-                        <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                          <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">
-                            2
-                          </p>
-                        </div>
-                      </Link>
-                    </li>
-                    <li className="group">
-                      <Link to="/home/setting/#">
-                        <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                          <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">
-                            3
-                          </p>
-                        </div>
-                      </Link>
-                    </li>
-                    <li className="group">
-                      <Link to="/home/setting/#">
-                        <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                          <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">
-                            4
-                          </p>
-                        </div>
-                      </Link>
-                    </li>
-                    <li className="group">
-                      <Link to="/home/setting/#">
-                        <div className="size-[44px] flex items-center justify-center rounded-xl border border-heyhao-border bg-white shrink-0 group-hover:bg-[#165DFF17] group-[&.active]:bg-[#165DFF17] group-hover:border-[#165DFF17] group-[&.active]:border-[#165DFF17] transition-all duration-300">
-                          <p className="font-semibold leading-[20px] transition-all duration-300 group-hover:text-heyhao-blue group-[&.active]:text-heyhao-blue">
-                            5
                           </p>
                         </div>
                       </Link>
