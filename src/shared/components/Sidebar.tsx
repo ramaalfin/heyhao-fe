@@ -63,7 +63,7 @@ export default function Sidebar() {
       <ul className="flex flex-col gap-5">
         <li className="group">
           <Link
-            to="/"
+            to="/home/setting"
             className="size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center group-[.active]:bg-heyhao-blue hover:ring-1 hover:ring-heyhao-blue transition-all duration-300"
           >
             <img

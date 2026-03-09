@@ -11,6 +11,7 @@ import { AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPayment from "./features/discover/pages/SuccessPayment";
 import ChatPage from "./features/chat/pages/ChatPage";
+import SettingPage from "./features/setting/pages/SettingPage";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -72,6 +73,11 @@ const router = createBrowserRouter([
       {
         path: "/home/chat",
         element: <ChatPage />,
+        loader: requireAuthLoader,
+      },
+      {
+        path: "/home/setting",
+        element: <SettingPage />,
         loader: requireAuthLoader,
       },
     ],
