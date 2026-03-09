@@ -1,6 +1,9 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 export default function SidebarMenu() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
   return (
     <aside className="flex h-screen w-fit">
       <div
@@ -13,7 +16,9 @@ export default function SidebarMenu() {
         >
           <h1 className="font-semibold text-2xl leading-[30px]">Settings</h1>
           <ul className="flex gap-3">
-            <li className="group">
+            <li
+              className={`group ${pathname === "/home/setting" ? "active" : ""}`}
+            >
               <button
                 id="Search"
                 className="size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 ring-heyhao-border hover:ring-1 hover:ring-heyhao-blue transition-all duration-300"
@@ -34,7 +39,10 @@ export default function SidebarMenu() {
           <div className="flex flex-col gap-4">
             <h3 className="font-medium leading-5">Main Menu</h3>
             <div className="flex flex-col gap-1">
-              <Link to="/home/settings-general" className="group active">
+              <Link
+                to="/home/setting"
+                className={`group ${pathname === "/home/setting" ? "active" : ""}`}
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/setting-2.svg"
@@ -51,7 +59,10 @@ export default function SidebarMenu() {
                   </p>
                 </div>
               </Link>
-              <Link to="/home/setting/account" className="group">
+              <Link
+                to="/home/setting/account"
+                className={`group ${pathname === "/home/setting/account" ? "active" : ""}`}
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/user-square-nonactive.svg"
@@ -68,7 +79,10 @@ export default function SidebarMenu() {
                   </p>
                 </div>
               </Link>
-              <Link to="/home/setting/groups" className="group">
+              <Link
+                to="/home/setting/groups"
+                className={`group ${pathname === "/home/setting/groups" ? "active" : ""}`}
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/crown-grey.svg"

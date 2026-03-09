@@ -12,6 +12,8 @@ import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPayment from "./features/discover/pages/SuccessPayment";
 import ChatPage from "./features/chat/pages/ChatPage";
 import SettingPage from "./features/setting/pages/SettingPage";
+import SettingAccountPage from "./features/setting/pages/SettingAccountPage";
+import SettingGroupPage from "./features/setting/pages/SettingGroupPage";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -78,6 +80,16 @@ const router = createBrowserRouter([
       {
         path: "/home/setting",
         element: <SettingPage />,
+        loader: requireAuthLoader,
+      },
+      {
+        path: "/home/setting/account",
+        element: <SettingAccountPage />,
+        loader: requireAuthLoader,
+      },
+      {
+        path: "/home/setting/groups",
+        element: <SettingGroupPage />,
         loader: requireAuthLoader,
       },
     ],
