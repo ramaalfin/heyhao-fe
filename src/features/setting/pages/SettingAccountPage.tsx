@@ -1,6 +1,11 @@
+import secureLocalStorage from "react-secure-storage";
 import SidebarMenu from "../components/SidebarMenu";
+import { AUTH_KEY } from "../../../shared/utils/constant";
+import { SignUpResponse } from "../../auth/api/signUp";
 
 export default function SettingAccountPage() {
+  const auth = secureLocalStorage.getItem(AUTH_KEY) as SignUpResponse;
+
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
       <SidebarMenu />
@@ -14,11 +19,14 @@ export default function SettingAccountPage() {
         <div className="overflow-y-auto [&::-webkit-scrollbar]:hidden">
           <div className="w-full flex min-h-[calc(100vh-123px)] p-[30px] justify-center">
             <div className="flex flex-col gap-[30px] w-[435px]">
-              <section id="Avatar" className="flex items-center gap-[12px]">
+              <section
+                id="Avatar"
+                className="flex items-center flex-col gap-[12px]"
+              >
                 <div className="flex items-center justify-center rounded-full overflow-hidden size-[100px] shrink-0">
                   <img
                     id="photo-container"
-                    src="assets/images/photos/my-account.png"
+                    src={auth?.photo || "/assets/images/photos/my-account.png"}
                     alt="image"
                     className="object-cover size-full"
                   />
@@ -34,7 +42,7 @@ export default function SettingAccountPage() {
                   className="flex items-center gap-[6px] px-[24px] py-[14px] rounded-full bg-heyhao-black"
                 >
                   <img
-                    src="assets/images/icons/edit-2-white-fill.svg"
+                    src="/assets/images/icons/edit-2-white-fill.svg"
                     alt="icon"
                     className="size-6 shrink-0"
                   />
@@ -47,7 +55,7 @@ export default function SettingAccountPage() {
                 <div id="Email" className="relative">
                   <div className="relative h-[72px] overflow-hidden rounded-[24px] bg-heyhao-border py-[24px]">
                     <img
-                      src="assets/images/icons/sms-grey.svg"
+                      src="/assets/images/icons/sms-grey.svg"
                       alt="icon"
                       className="absolute left-[24px] top-1/2 size-[24px] shrink-0 -translate-y-1/2"
                     />
@@ -56,7 +64,7 @@ export default function SettingAccountPage() {
                       id="Email"
                       placeholder=""
                       type="email"
-                      value="Bimore@shaynakit.com"
+                      value={auth?.email ?? "-"}
                       className="peer absolute bottom-0 left-0 right-0 top-0 w-full h-full bg-transparent font-semibold leading-[20px] focus:outline-none pb-[16px] pl-[80px] pt-[36px] z-10"
                     />
                     <label
@@ -70,7 +78,7 @@ export default function SettingAccountPage() {
                 <div id="Fullname" className="relative">
                   <div className="relative h-[72px] overflow-hidden rounded-[24px] bg-white py-[24px] border-[1.5px] border-heyhao-border">
                     <img
-                      src="assets/images/icons/user-square-grey.svg"
+                      src="/assets/images/icons/user-square-grey.svg"
                       alt="icon"
                       className="absolute left-[24px] top-1/2 size-[24px] shrink-0 -translate-y-1/2"
                     />
@@ -80,7 +88,7 @@ export default function SettingAccountPage() {
                       id="Fullname"
                       placeholder=""
                       type="text"
-                      value="Bimore Wannabe"
+                      value={auth?.name ?? "-"}
                       className="peer absolute bottom-0 left-0 right-0 top-0 w-full h-full bg-transparent font-semibold leading-[20px] focus:outline-none pb-[16px] pl-[80px] pt-[36px] z-10"
                     />
                     <label
@@ -94,7 +102,7 @@ export default function SettingAccountPage() {
                 <div id="Password" className="relative">
                   <div className="relative h-[72px] overflow-hidden rounded-[24px] bg-white py-[24px] border-[1.5px] border-heyhao-border">
                     <img
-                      src="assets/images/icons/lock-grey.svg"
+                      src="/assets/images/icons/lock-grey.svg"
                       alt="icon"
                       className="absolute left-[24px] top-1/2 size-[24px] shrink-0 -translate-y-1/2"
                     />
@@ -105,12 +113,12 @@ export default function SettingAccountPage() {
                       className="show-password absolute right-[24px] transform -translate-y-1/2 top-1/2 z-30"
                     >
                       <img
-                        src="assets/images/icons/eye-grey.svg"
+                        src="/assets/images/icons/eye-grey.svg"
                         alt="Hide password icon"
                         className="show-icon size-[24px] shrink-0"
                       />
                       <img
-                        src="assets/images/icons/eye-slash-black.svg"
+                        src="/assets/images/icons/eye-slash-black.svg"
                         alt="Show password icon"
                         className="hide-icon size-[24px] shrink-0 hidden"
                       />
