@@ -155,9 +155,8 @@ export default function SettingGroupPage() {
                             </div>
                           </td>
                           <td
-                            className={`group ${
-                              group.type === "PAID" ? "vip" : "free"
-                            } w-full min-w-[204px] pl-6`}
+                            className={`group ${group.type === "PAID" ? "vip" : "free"
+                              } w-full min-w-[204px] pl-6`}
                           >
                             <div
                               id="Vip"
