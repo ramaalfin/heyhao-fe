@@ -1,9 +1,17 @@
 import { Link, useParams } from "react-router";
 import { useGetDetailGroup } from "../hooks/useGetDetailGroup";
+import secureLocalStorage from "react-secure-storage";
+import { AUTH_KEY } from "../../../shared/utils/constant";
 
 export default function SettingGroupDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { detailGroup, isLoading, error } = useGetDetailGroup(id || "");
+
+  const auth = secureLocalStorage.getItem(AUTH_KEY) as any;
+
+  const isOwnerGroup = detailGroup?.room?.members?.some(
+    (member) => member?.user?.id === auth?.user?.id,
+  );
 
   if (isLoading) {
     return (
@@ -220,18 +228,20 @@ export default function SettingGroupDetailPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-[12px]">
-                        <button type="button" className="shrink-0">
-                          <div className="flex items-center gap-[2px] py-[14px] px-4 rounded-xl bg-[#ED6B6017] backdrop-blur-sm">
-                            <img
-                              src="/assets/images/icons/judge-red-fill.svg"
-                              alt="icon"
-                              className="size-4 shrink-0"
-                            />
-                            <p className="font-semibold text-sm leading-[17.5px] text-heyhao-coral">
-                              Ban Now
-                            </p>
-                          </div>
-                        </button>
+                        {!isOwnerGroup && (
+                          <button type="button" className="shrink-0">
+                            <div className="flex items-center gap-[2px] py-[14px] px-4 rounded-xl bg-[#ED6B6017] backdrop-blur-sm">
+                              <img
+                                src="/assets/images/icons/judge-red-fill.svg"
+                                alt="icon"
+                                className="size-4 shrink-0"
+                              />
+                              <p className="font-semibold text-sm leading-[17.5px] text-heyhao-coral">
+                                Ban Now
+                              </p>
+                            </div>
+                          </button>
+                        )}
                         <Link
                           to="/message-room-chat-people"
                           className="shrink-0"
