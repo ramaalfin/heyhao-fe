@@ -9,9 +9,11 @@ export default function SettingGroupDetailPage() {
 
   const auth = secureLocalStorage.getItem(AUTH_KEY) as any;
 
-  const isOwnerGroup = detailGroup?.room?.members?.some(
-    (member) => member?.user?.id === auth?.user?.id,
+  const owner = detailGroup?.room?.members?.find(
+    (member) => member.role?.role === "OWNER",
   );
+
+  const isUserOwner = owner?.user?.id === auth?.id;
 
   if (isLoading) {
     return (
@@ -141,60 +143,54 @@ export default function SettingGroupDetailPage() {
               </section>
 
               {/* Group Owner */}
-              {detailGroup.room?.members &&
-                detailGroup.room.members.length > 0 && (
-                  <section
-                    id="Group-Owner"
-                    className="flex flex-col gap-[12px]"
-                  >
-                    <h2 className="font-semibold leading-5">Group Owner</h2>
-                    <div className="flex items-center border border-heyhao-border p-4 rounded-2xl justify-between">
-                      <div className="flex items-center gap-[12px]">
-                        <div className="flex items-center shrink-0 justify-center size-[50px] rounded-full overflow-hidden bg-heyhao-grey">
-                          {detailGroup.room.members[0].user.photo_url ? (
+              {owner && (
+                <section id="Group-Owner" className="flex flex-col gap-[12px]">
+                  <h2 className="font-semibold leading-5">Group Owner</h2>
+                  <div className="flex items-center border border-heyhao-border p-4 rounded-2xl justify-between">
+                    <div className="flex items-center gap-[12px]">
+                      <div className="flex items-center shrink-0 justify-center size-[50px] rounded-full overflow-hidden bg-heyhao-grey">
+                        {owner.user.photo_url ? (
+                          <img
+                            src={owner.user.photo_url}
+                            alt="image"
+                            className="size-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-heyhao-blue font-bold">
+                            {owner.user.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-[6px]">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <img
-                              src={detailGroup.room.members[0].user.photo_url}
-                              alt="image"
-                              className="size-full object-cover"
+                              src="/assets/images/icons/owner-badge-blue-fill.svg"
+                              alt="icon"
+                              className="shrink-0 size-5"
                             />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-heyhao-blue font-bold">
-                              {detailGroup.room.members[0].user.name
-                                .charAt(0)
-                                .toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-[6px]">
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1">
-                              <img
-                                src="/assets/images/icons/owner-badge-blue-fill.svg"
-                                alt="icon"
-                                className="shrink-0 size-5"
-                              />
-                              <h3 className="font-semibold leading-5">
-                                {detailGroup.room.members[0].user.name}
-                              </h3>
-                            </div>
+                            <h3 className="font-semibold leading-5">
+                              {owner.user.name}
+                            </h3>
                           </div>
                         </div>
                       </div>
-                      <Link to="/" className="shrink-0">
-                        <div className="flex items-center gap-[2px] py-[14px] px-4 rounded-xl bg-[#165DFF17] backdrop-blur-sm">
-                          <img
-                            src="/assets/images/icons/user-edit-blue.svg"
-                            alt="icon"
-                            className="size-4 shrink-0"
-                          />
-                          <p className="font-semibold text-sm leading-[17.5px] text-heyhao-blue">
-                            Change Owner
-                          </p>
-                        </div>
-                      </Link>
                     </div>
-                  </section>
-                )}
+                    <Link to="/" className="shrink-0">
+                      <div className="flex items-center gap-[2px] py-[14px] px-4 rounded-xl bg-[#165DFF17] backdrop-blur-sm">
+                        <img
+                          src="/assets/images/icons/user-edit-blue.svg"
+                          alt="icon"
+                          className="size-4 shrink-0"
+                        />
+                        <p className="font-semibold text-sm leading-[17.5px] text-heyhao-blue">
+                          Change Owner
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                </section>
+              )}
 
               {/* Group Member */}
               <section id="Group-Member" className="flex flex-col gap-[12px]">
@@ -228,7 +224,7 @@ export default function SettingGroupDetailPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-[12px]">
-                        {!isOwnerGroup && (
+                        {isUserOwner && member.user.id !== auth?.id && (
                           <button type="button" className="shrink-0">
                             <div className="flex items-center gap-[2px] py-[14px] px-4 rounded-xl bg-[#ED6B6017] backdrop-blur-sm">
                               <img

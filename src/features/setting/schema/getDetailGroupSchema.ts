@@ -12,6 +12,7 @@ export interface DetailGroup {
 }
 
 export interface Asset {
+  id: string;
   filename: string;
 }
 
@@ -22,7 +23,12 @@ export interface Room {
 }
 
 export interface Member {
+  role: Role;
   user: User;
+}
+
+export interface Role {
+  role: string;
 }
 
 export interface User {

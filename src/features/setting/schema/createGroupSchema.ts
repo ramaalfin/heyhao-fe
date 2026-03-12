@@ -14,10 +14,11 @@ export interface GroupResponse {
 }
 
 export const createGroupSchema = z.object({
+  id: z.string().optional(),
   type: z.enum(["FREE", "PAID"]),
   name: z.string().min(1, "Group name is required"),
   about: z.string().min(1, "About group is required"),
-  photo: z.any().refine((file) => file instanceof File, "Photo is required"),
+  photo: z.any().refine((file) => file instanceof File || typeof file === "string", "Photo is required"),
   price: z.coerce.number().optional(),
   benefit: z.array(z.string()).optional(),
   assets: z.array(z.any()).optional(),
@@ -37,7 +38,7 @@ export const createGroupSchema = z.object({
         path: ["benefit"],
       });
     }
-    if (!data.assets || data.assets.length === 0) {
+    if (!data.id && (!data.assets || data.assets.length === 0)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "At least one asset is required",

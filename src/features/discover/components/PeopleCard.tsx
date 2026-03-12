@@ -11,8 +11,6 @@ export default function PeopleCard({
   const navigate = useNavigate();
   const { mutateAsync, isPending, isError, error } = useCreateRoom();
 
-  console.log("data", data);
-
   const handleCreateRoom = async () => {
     try {
       await mutateAsync({ user_id: data.id });
