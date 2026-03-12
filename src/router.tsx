@@ -16,6 +16,7 @@ import SettingAccountPage from "./features/setting/pages/SettingAccountPage";
 import SettingGroupPage from "./features/setting/pages/SettingGroupPage";
 import SettingGroupDetailPage from "./features/setting/pages/SettingGroupDetailPage";
 import SettingGroupCreatePage from "./features/setting/pages/SettingGroupCreatePage";
+import CreateGroupPage from "./features/setting/pages/CreateGroupPage";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -102,6 +103,7 @@ const router = createBrowserRouter([
       {
         path: "/home/setting/groups/create",
         element: <SettingGroupCreatePage />,
+        element: <CreateGroupPage />,
         loader: requireAuthLoader,
       },
     ],
