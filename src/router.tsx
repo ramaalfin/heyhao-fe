@@ -17,6 +17,8 @@ import SettingGroupPage from "./features/setting/pages/SettingGroupPage";
 import SettingGroupDetailPage from "./features/setting/pages/SettingGroupDetailPage";
 import CreateGroupPage from "./features/setting/pages/CreateGroupPage";
 import EditGroupPage from "./features/setting/pages/EditGroupPage";
+import RevenuePage from "./features/revenue/pages/RevenuePage";
+
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -78,6 +80,11 @@ const router = createBrowserRouter([
       {
         path: "/home/chat",
         element: <ChatPage />,
+        loader: requireAuthLoader,
+      },
+      {
+        path: "/home/revenue",
+        element: <RevenuePage />,
         loader: requireAuthLoader,
       },
       {
