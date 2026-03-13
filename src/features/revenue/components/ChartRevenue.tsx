@@ -11,7 +11,6 @@ import {
   TooltipItem,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { faker } from "@faker-js/faker";
 import { useMemo } from "react";
 
 ChartJS.register(
@@ -25,49 +24,18 @@ ChartJS.register(
   Filler,
 );
 
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
+interface Props {
+  transactionsPerMonths: Record<string, number>;
+}
 
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: "Dataset 1",
-      data: labels.map(() => faker.finance.amount({ min: 0, max: 1000 })),
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: "rgba(255, 99, 132, 0.5)",
-    },
-    {
-      label: "Dataset 2",
-      data: labels.map(() => faker.finance.amount({ min: -1000, max: 1000 })),
-      borderColor: "rgb(53, 162, 235)",
-      backgroundColor: "rgba(53, 162, 235, 0.5)",
-    },
-  ],
-};
-
-export default function ChartRevenue() {
-  const data = {
-    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+export default function ChartRevenue({ transactionsPerMonths }: Props) {
+  const data2 = {
+    labels: Object.keys(transactionsPerMonths),
     datasets: [
       {
-        label: "My First Dataset",
-        data: [300, 50, 100],
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#36A2EB",
-          "#FFCE56",
-          "#FF6384",
-        ],
-        hoverBackgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#36A2EB",
-          "#FFCE56",
-          "#FF6384",
-        ],
+        label: "Revenue",
+        data: Object.values(transactionsPerMonths),
+        backgroundColor: "#FFFFFF",
       },
     ],
   };
@@ -83,7 +51,9 @@ export default function ChartRevenue() {
         tooltip: {
           callbacks: {
             label: function (tooltipItem: TooltipItem<"line">) {
-              return `Rp ${(tooltipItem.raw as number).toLocaleString()}`;
+              return `Rp ${(tooltipItem.raw as number).toLocaleString(
+                "id-ID",
+              )}`;
             },
           },
           backgroundColor: "#165DFF",
@@ -110,9 +80,8 @@ export default function ChartRevenue() {
             color: "transparent",
           },
           ticks: {
-            stepSize: 100,
             callback: function (value: string | number) {
-              return `Rp ${Number(value).toLocaleString()}`;
+              return `Rp ${Number(value).toLocaleString("id-ID")}`;
             },
             color: "#617686",
             padding: 20,
@@ -150,7 +119,12 @@ export default function ChartRevenue() {
             />
             <p className="font-medium text-heyhao-secondary">Total Revenue</p>
           </div>
-          <p className="font-bold text-[32px] leading-10">Rp320.500.000</p>
+          <p className="font-bold text-[32px] leading-10">
+            Rp{" "}
+            {Object.values(transactionsPerMonths)
+              .reduce((acc, curr) => acc + curr, 0)
+              .toLocaleString("id-ID")}
+          </p>
         </div>
         <button className="flex items-center rounded-3xl border-[1.5px] border-heyhao-border py-3 px-4 gap-1 bg-heyhao-blue/10">
           <img
@@ -163,7 +137,7 @@ export default function ChartRevenue() {
       </div>
       <div>
         {/* <canvas id="revenueChart" height="306px"> */}
-        <Line options={options} data={data} />
+        <Line options={options} data={data2} />
         {/* </canvas> */}
       </div>
     </div>
