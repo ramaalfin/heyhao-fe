@@ -1,10 +1,51 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useGetBalance } from "../hooks/useGetBalance";
+import secureLocalStorage from "react-secure-storage";
+import { AUTH_KEY } from "../../../shared/utils/constant";
+import { SignUpResponse } from "../../auth/api/signUp";
+import { useCreatePayouts } from "../hooks/useCreatePayouts";
+import { useForm, Controller } from "react-hook-form";
+import { withdrawSchema, WithdrawValues } from "../utils/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 
 export default function WithdrawPage() {
+  const navigate = useNavigate();
   const { data: balance } = useGetBalance();
+  const { mutateAsync: createPayouts, isPending: isPendingCreatePayouts } = useCreatePayouts();
 
-  console.log(balance);
+  const { control, handleSubmit, watch, formState: { errors } } = useForm<WithdrawValues>({
+    resolver: zodResolver(withdrawSchema),
+    defaultValues: {
+      amount: "",
+      bank_name: "",
+      bank_account_number: "",
+      bank_account_name: "",
+    },
+  });
+
+  const amount = watch("amount");
+
+  const auth = secureLocalStorage.getItem(AUTH_KEY) as SignUpResponse;
+
+  const onSubmit = async (data: WithdrawValues) => {
+    try {
+      if (Number(data.amount) > (balance || 0)) {
+        toast.error("Balance tidak cukup");
+        return;
+      }
+      await createPayouts({
+        amount: Number(data.amount),
+        bank_name: data.bank_name,
+        bank_account_number: Number(data.bank_account_number),
+        bank_account_name: data.bank_account_name,
+      });
+      toast.success("Withdraw request submitted successfully");
+      navigate("/home/revenue/payouts");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to submit withdraw request");
+    }
+  };
 
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
@@ -37,21 +78,27 @@ export default function WithdrawPage() {
             <div className="flex flex-1 min-h-screen">
               <div className="flex w-[636px] shrink-0 bg-white">
                 <form
-                  action="withdraw-success.html"
+                  onSubmit={handleSubmit(onSubmit)}
                   className="flex flex-col flex-1 gap-[30px] p-[30px] bg-white"
                 >
                   <div className="flex flex-col gap-3">
                     <p className="font-medium text-sm text-heyhao-secondary">
                       Total Amount
                     </p>
-                    <label className="relative group">
-                      <input
-                        type="number"
-                        autoComplete="off"
-                        name=""
-                        id=""
-                        placeholder=""
-                        className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-[110px] gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                    <div className="relative group">
+                      <Controller
+                        name="amount"
+                        control={control}
+                        render={({ field }) => (
+                          <input
+                            type="number"
+                            autoComplete="off"
+                            {...field}
+                            id=""
+                            placeholder=""
+                            className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-[110px] gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                          />
+                        )}
                       />
                       <div className="absolute transform -translate-y-1/2 top-1/2 left-6 flex gap-4 items-center">
                         <img
@@ -69,30 +116,32 @@ export default function WithdrawPage() {
                           Rp
                         </span>
                       </div>
-                      <span className="absolute inset-0 flex items-center right-0 bg-[linear-gradient(90deg,rgba(237,107,96,0)_80%,rgba(237,107,96,0.09)_100%)] rounded-xl border border-heyhao-coral">
-                        <img
-                          src="/assets/images/icons/information.svg"
-                          className="ml-auto flex size-6 shrink-0"
-                          alt="icon"
-                        />
-                        <span className="font-medium text-sm text-heyhao-coral ml-1 mr-5">
-                          Balance Kurang
-                        </span>
+                    </div>
+                    {errors.amount && (
+                      <span className="text-heyhao-coral text-sm">
+                        {errors.amount.message}
                       </span>
-                    </label>
+                    )}
                   </div>
                   <div className="flex flex-col gap-3">
                     <p className="font-medium text-sm text-heyhao-secondary">
                       Select Bank
                     </p>
-                    <label className="relative group">
-                      <input
-                        type="text"
-                        autoComplete="off"
-                        name=""
-                        id=""
-                        placeholder="Type your bank account?"
-                        className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-20 gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                    <div className="relative group">
+                      <Controller
+                        name="bank_name"
+                        control={control}
+                        render={({ field }) => (
+                          <select
+                            {...field}
+                            className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-20 gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                          >
+                            <option value="">Select Bank</option>
+                            <option value="BCA">BCA</option>
+                            <option value="MANDIRI">Bank Mandiri</option>
+                            <option value="BNI">Bank BNI</option>
+                          </select>
+                        )}
                       />
                       <div className="absolute transform -translate-y-1/2 top-1/2 left-6 flex gap-4 items-center">
                         <img
@@ -107,30 +156,31 @@ export default function WithdrawPage() {
                         />
                         <div className="flex h-6 shrink-0 border border-heyhao-border"></div>
                       </div>
-                      <span className="absolute inset-0 flex items-center right-0 bg-[linear-gradient(90deg,rgba(237,107,96,0)_80%,rgba(237,107,96,0.09)_100%)] rounded-xl border border-heyhao-coral">
-                        <img
-                          src="/assets/images/icons/information.svg"
-                          className="ml-auto flex size-6 shrink-0"
-                          alt="icon"
-                        />
-                        <span className="font-medium text-sm text-heyhao-coral ml-1 mr-5">
-                          Bank tidak dikenal
-                        </span>
+                    </div>
+                    {errors.bank_name && (
+                      <span className="text-heyhao-coral text-sm">
+                        {errors.bank_name.message}
                       </span>
-                    </label>
+                    )}
                   </div>
                   <div className="flex flex-col gap-3">
                     <p className="font-medium text-sm text-heyhao-secondary">
                       Bank Account Number
                     </p>
-                    <label className="relative group">
-                      <input
-                        type="number"
-                        autoComplete="off"
-                        name=""
-                        id=""
-                        placeholder="Type your bank number?"
-                        className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-20 gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                    <div className="relative group">
+                      <Controller
+                        name="bank_account_number"
+                        control={control}
+                        render={({ field }) => (
+                          <input
+                            type="number"
+                            autoComplete="off"
+                            {...field}
+                            id=""
+                            placeholder=""
+                            className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-20 gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                          />
+                        )}
                       />
                       <div className="absolute transform -translate-y-1/2 top-1/2 left-6 flex gap-4 items-center">
                         <img
@@ -145,27 +195,31 @@ export default function WithdrawPage() {
                         />
                         <div className="flex h-6 shrink-0 border border-heyhao-border"></div>
                       </div>
-                      <span className="absolute inset-0 flex items-center right-0 bg-[linear-gradient(90deg,rgba(48,178,45,0)_80%,rgba(48,178,45,0.09)_100%)] rounded-r-xl">
-                        <img
-                          src="/assets/images/icons/verifiy-green-fill.svg"
-                          className="ml-auto mr-5 flex size-6 shrink-0"
-                          alt="icon"
-                        />
+                    </div>
+                    {errors.bank_account_number && (
+                      <span className="text-heyhao-coral text-sm">
+                        {errors.bank_account_number.message}
                       </span>
-                    </label>
+                    )}
                   </div>
                   <div className="flex flex-col gap-3">
                     <p className="font-medium text-sm text-heyhao-secondary">
                       Bank Account Name
                     </p>
-                    <label className="relative group">
-                      <input
-                        type="text"
-                        autoComplete="off"
-                        name=""
-                        id=""
-                        placeholder="Under whose name is the bank you use?"
-                        className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-20 gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                    <div className="relative group">
+                      <Controller
+                        name="bank_account_name"
+                        control={control}
+                        render={({ field }) => (
+                          <input
+                            type="text"
+                            autoComplete="off"
+                            {...field}
+                            id=""
+                            placeholder=""
+                            className="relative appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 px-6 pl-20 gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300"
+                          />
+                        )}
                       />
                       <div className="absolute transform -translate-y-1/2 top-1/2 left-6 flex gap-4 items-center">
                         <img
@@ -180,13 +234,19 @@ export default function WithdrawPage() {
                         />
                         <div className="flex h-6 shrink-0 border border-heyhao-border"></div>
                       </div>
-                    </label>
+                    </div>
+                    {errors.bank_account_name && (
+                      <span className="text-heyhao-coral text-sm">
+                        {errors.bank_account_name.message}
+                      </span>
+                    )}
                   </div>
                   <button
                     type="submit"
-                    className="h-[62px] rounded-full py-4 px-6 bg-heyhao-blue font-bold leading-5 text-white w-fit mb-[30px]"
+                    disabled={isPendingCreatePayouts}
+                    className="h-[62px] rounded-full py-4 px-6 bg-heyhao-blue font-bold leading-5 text-white w-fit mb-[30px] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Request for Withdraw
+                    {isPendingCreatePayouts ? "Requesting..." : "Request for Withdraw"}
                   </button>
                   <span className="spacer flex h-[30px] shrink-0"></span>
                 </form>
@@ -219,8 +279,8 @@ export default function WithdrawPage() {
                         </p>
                       </div>
                       <hr className="border-white/21 mt-10 mb-6" />
-                      <p className="font-medium leading-5 text-[#876A9E]">
-                        Bimore Wannabe
+                      <p className="font-medium leading-5 text-[#876A9E] capitalize">
+                        {auth?.name || ""}
                       </p>
                     </div>
                   </div>

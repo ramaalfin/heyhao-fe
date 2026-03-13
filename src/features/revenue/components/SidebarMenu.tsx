@@ -1,6 +1,9 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 export default function SidebarMenu() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
   return (
     <div
       id="Sidebar"
@@ -33,8 +36,14 @@ export default function SidebarMenu() {
         <div className="flex flex-col gap-4 p-6">
           <p className="font-medium">Main Menu</p>
           <div className="flex flex-col gap-1">
-            <Link to="/home/revenue" className="group active">
-              <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
+            <Link
+              to="/home/revenue"
+              className={`group ${pathname === "/home/revenue" || pathname === "/home/revenue/withdraw" ? "active" : ""}`}
+            >
+              <div
+                className={`flex items-center rounded-xl p-4 gap-2 bg-white group-hover:bg-heyhao-grey transition-all duration-300 ${pathname === "/home/revenue" || pathname === "/home/revenue/withdraw" ? "bg-heyhao-grey group-[.active]:bg-heyhao-grey" : ""
+                  }`}
+              >
                 <img
                   src="/assets/images/icons/wallet-3-grey.svg"
                   className="flex size-6 shrink-0 group-[.active]:hidden group-hover:hidden transition-all duration-300"
@@ -50,8 +59,14 @@ export default function SidebarMenu() {
                 </p>
               </div>
             </Link>
-            <Link to="/home/revenue/history" className="group">
-              <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
+            <Link
+              to="/home/revenue/payouts"
+              className={`group ${pathname === "/home/revenue/payouts" ? "active" : ""}`}
+            >
+              <div
+                className={`flex items-center rounded-xl p-4 gap-2 bg-white group-hover:bg-heyhao-grey transition-all duration-300 ${pathname === "/home/revenue/payouts" ? "bg-heyhao-grey group-[.active]:bg-heyhao-grey" : ""
+                  }`}
+              >
                 <img
                   src="/assets/images/icons/note-grey.svg"
                   className="flex size-6 shrink-0 group-[.active]:hidden group-hover:hidden transition-all duration-300"
@@ -67,8 +82,14 @@ export default function SidebarMenu() {
                 </p>
               </div>
             </Link>
-            <Link to="/home/revenue/report" className="group">
-              <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
+            <Link
+              to="/home/revenue/report"
+              className={`group ${pathname === "/home/revenue/report" ? "active" : ""}`}
+            >
+              <div
+                className={`flex items-center rounded-xl p-4 gap-2 bg-white group-hover:bg-heyhao-grey transition-all duration-300 ${pathname === "/home/revenue/report" ? "bg-heyhao-grey group-[.active]:bg-heyhao-grey" : ""
+                  }`}
+              >
                 <img
                   src="/assets/images/icons/status-up-grey.svg"
                   className="flex size-6 shrink-0 group-[.active]:hidden group-hover:hidden transition-all duration-300"
