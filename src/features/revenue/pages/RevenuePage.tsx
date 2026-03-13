@@ -55,7 +55,7 @@ export default function RevenuePage() {
                       </div>
                     </div>
                     <Link
-                      to="/withdraw-money"
+                      to="/home/revenue/withdraw"
                       className="rounded-full bg-heyhao-blue flex items-center justify-center gap-[10px] py-4 text-white w-full font-bold leading-[20px] text-center"
                     >
                       <p>Withdraw Money</p>
