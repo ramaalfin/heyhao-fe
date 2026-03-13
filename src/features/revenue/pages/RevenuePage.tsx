@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import SidebarMenu from "../components/SidebarMenu";
+import ChartRevenue from "../components/ChartRevenue";
 
 export default function RevenuePage() {
   return (
@@ -96,41 +97,9 @@ export default function RevenuePage() {
                   </div>
                 </div>
               </div>
-              <div
-                id="Total-Revenue"
-                className="flex flex-col rounded-2xl border border-heyhao-border p-6 gap-6 bg-white"
-              >
-                <div className="flex items-center justify-between gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-[6px]">
-                      <img
-                        src="/assets/images/icons/dollar-circle-yellow-opacity.svg"
-                        className="flex size-11 shrink-0"
-                        alt="icon"
-                      />
-                      <p className="font-medium text-heyhao-secondary">
-                        Total Revenue
-                      </p>
-                    </div>
-                    <p className="font-bold text-[32px] leading-10">
-                      Rp320.500.000
-                    </p>
-                  </div>
-                  <button className="flex items-center rounded-3xl border-[1.5px] border-heyhao-border py-3 px-4 gap-1 bg-heyhao-blue/10">
-                    <img
-                      src="/assets/images/icons/calendar-2-blue.svg"
-                      className="flex size-6 shrink-0"
-                      alt="icon"
-                    />
-                    <p className="font-medium text-sm text-heyhao-blue">
-                      Last 8 Month
-                    </p>
-                  </button>
-                </div>
-                <div>
-                  <canvas id="revenueChart" height="306px"></canvas>
-                </div>
-              </div>
+
+              <ChartRevenue />
+
               <div
                 id="Users"
                 className="flex flex-col gap-[30px] justify-center"
