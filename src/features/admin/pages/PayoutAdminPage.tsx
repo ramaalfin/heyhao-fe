@@ -44,8 +44,8 @@ export default function PayoutAdminPage() {
                     <p className="font-semibold">Action</p>
                   </div>
                 </div>
-                {!isLoading &&
-                  data?.map((item) => (
+                {!isLoading && !error && data && data.length > 0 &&
+                  data.map((item) => (
                     <div
                       key={item.id}
                       className="user-row flex items-center gap-6 p-6 border-t border-heyhao-border"
@@ -113,11 +113,11 @@ export default function PayoutAdminPage() {
                     </div>
                   ))}
                 {isLoading && (
-                  <div className="flex items-center justify-center">
-                    <p className="font-semibold">Loading...</p>
+                  <div className="flex items-center justify-center py-10">
+                    <p className="font-semibold">Loading history...</p>
                   </div>
                 )}
-                {error && (
+                {!isLoading && !error && data?.length === 0 && (
                   <div className="flex flex-col items-center justify-center w-full h-[500px] border-t border-heyhao-border gap-6">
                     <img
                       src="/assets/images/icons/card-remove-2-grey.svg"
@@ -125,7 +125,14 @@ export default function PayoutAdminPage() {
                       alt="icon"
                     />
                     <p className="font-medium text-lg text-heyhao-secondary text-center">
-                      Seems like you’ve never done <br />a withdrawal before!
+                      Seems like there are no <br />withdrawal requests yet!
+                    </p>
+                  </div>
+                )}
+                {error && (
+                  <div className="flex flex-col items-center justify-center w-full h-[500px] border-t border-heyhao-border gap-6">
+                    <p className="font-medium text-lg text-heyhao-red text-center">
+                      Failed to load payout history. <br /> Please try again later.
                     </p>
                   </div>
                 )}

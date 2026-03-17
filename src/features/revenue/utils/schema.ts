@@ -16,7 +16,7 @@ export const getPayoutSchema = z.array(
         bank_account_number: z.string(),
         bank_account_name: z.string(),
         status: z.string(),
-        proof: z.null(),
+        proof: z.string().nullable(),
         created_at: z.string()
     })
 )

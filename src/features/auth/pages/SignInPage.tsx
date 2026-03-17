@@ -36,7 +36,7 @@ export default function SignInPage({ isAdmin }: Props) {
 
       if (isAdmin) {
         secureLocalStorage.setItem(AUTH_ADMIN_KEY, response.data);
-        window.location.replace("/admin");
+        window.location.replace("/admin/payouts");
       } else {
         secureLocalStorage.setItem(AUTH_KEY, response.data);
         window.location.replace("/home/chat");

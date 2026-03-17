@@ -22,6 +22,7 @@ import WithdrawPage from "./features/revenue/pages/WithdrawPage";
 import PayoutPage from "./features/revenue/pages/PayoutPage";
 import LayoutAdminPage from "./shared/components/LayoutAdminPage";
 import PayoutAdminPage from "./features/admin/pages/PayoutAdminPage";
+import ApprovalPage from "./features/admin/pages/ApprovalPage";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -162,8 +163,12 @@ const router = createBrowserRouter([
     element: <LayoutAdminPage />,
     children: [
       {
-        path: "/admin",
+        path: "/admin/payouts",
         element: <PayoutAdminPage />,
+      },
+      {
+        path: "/admin/approve/:id",
+        element: <ApprovalPage />,
       },
     ],
   },
