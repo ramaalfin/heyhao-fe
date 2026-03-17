@@ -1,4 +1,10 @@
+import { Link } from "react-router";
+import { formatDate } from "../../../shared/utils/formatDate";
+import { useGetAdminPayout } from "../hooks/useGetAdminPayout";
+
 export default function PayoutAdminPage() {
+  const { data, isLoading, error } = useGetAdminPayout();
+
   return (
     <main id="Main-Content-Container" className="relative flex flex-1">
       <div className="flex flex-col flex-1">
@@ -11,7 +17,7 @@ export default function PayoutAdminPage() {
         <div className="flex flex-1 overflow-hidden">
           <div
             id="Content"
-            className="flex flex-col w-full max-w-[836px] shrink-0 overflow-y-scroll hide-scrollbar mx-[30px] py-[30px] gap-4"
+            className="flex flex-col shrink-0 overflow-y-scroll hide-scrollbar mx-[30px] py-[30px] gap-4"
           >
             <div
               id="History"
@@ -34,9 +40,12 @@ export default function PayoutAdminPage() {
                   <div className="flex items-center w-[130px] shrink-0">
                     <p className="font-semibold">Status</p>
                   </div>
+                  <div className="flex items-center w-[130px] shrink-0">
+                    <p className="font-semibold">Action</p>
+                  </div>
                 </div>
-                {/* {!isLoading &&
-                  data?.data?.map((item) => (
+                {!isLoading &&
+                  data?.map((item) => (
                     <div
                       key={item.id}
                       className="user-row flex items-center gap-6 p-6 border-t border-heyhao-border"
@@ -91,6 +100,16 @@ export default function PayoutAdminPage() {
                           {item.status}
                         </p>
                       </div>
+                      {item.status === "PENDING" && (
+                        <div className="flex items-center w-[130px] shrink-0">
+                          <Link
+                            to={`/admin/approve/${item.id}`}
+                            className="bg-heyhao-blue text-white rounded-full px-4 py-3 transition-colors hover:bg-heyhao-blue/80 cursor-pointer"
+                          >
+                            Approve
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   ))}
                 {isLoading && (
@@ -109,7 +128,7 @@ export default function PayoutAdminPage() {
                       Seems like you’ve never done <br />a withdrawal before!
                     </p>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
             <section id="Pagination" className="mx-auto mt-[14px]">
