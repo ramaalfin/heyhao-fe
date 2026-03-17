@@ -7,7 +7,7 @@ import UpdatePasswordPage from "./features/auth/pages/UpdatePassword";
 import LayoutPage from "./shared/components/LayoutPage";
 import DiscoverPage from "./features/discover/pages/DiscoverPage";
 import secureLocalStorage from "react-secure-storage";
-import { AUTH_KEY } from "./shared/utils/constant";
+import { AUTH_ADMIN_KEY, AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPayment from "./features/discover/pages/SuccessPayment";
 import ChatPage from "./features/chat/pages/ChatPage";
@@ -20,6 +20,8 @@ import EditGroupPage from "./features/setting/pages/EditGroupPage";
 import RevenuePage from "./features/revenue/pages/RevenuePage";
 import WithdrawPage from "./features/revenue/pages/WithdrawPage";
 import PayoutPage from "./features/revenue/pages/PayoutPage";
+import LayoutAdminPage from "./shared/components/LayoutAdminPage";
+import PayoutAdminPage from "./features/admin/pages/PayoutAdminPage";
 
 const requireAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -29,10 +31,26 @@ const requireAuthLoader = () => {
   return true;
 };
 
+const requireAdminAuthLoader = () => {
+  const auth = secureLocalStorage.getItem(AUTH_ADMIN_KEY);
+  if (!auth) {
+    throw redirect("/admin/sign-in");
+  }
+  return true;
+};
+
 const requireNoAuthLoader = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
   if (auth) {
     throw redirect("/home/discover");
+  }
+  return true;
+};
+
+const requireNoAdminAuthLoader = () => {
+  const auth = secureLocalStorage.getItem(AUTH_ADMIN_KEY);
+  if (auth) {
+    throw redirect("/admin");
   }
   return true;
 };
@@ -132,6 +150,22 @@ const router = createBrowserRouter([
     path: "/success-payment",
     element: <SuccessPayment />,
     loader: requireAuthLoader,
+  },
+  {
+    path: "/admin/sign-in",
+    element: <SignInPage isAdmin />,
+    loader: requireNoAdminAuthLoader,
+  },
+  {
+    path: "/admin",
+    loader: requireAdminAuthLoader,
+    element: <LayoutAdminPage />,
+    children: [
+      {
+        path: "/admin",
+        element: <PayoutAdminPage />,
+      },
+    ],
   },
 ]);
 
