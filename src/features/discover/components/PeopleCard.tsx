@@ -9,7 +9,7 @@ export default function PeopleCard({
   data: GetDiscoverPeopleResponse;
 }) {
   const navigate = useNavigate();
-  const { mutateAsync, isPending, isError, error } = useCreateRoom();
+  const { mutateAsync, isPending } = useCreateRoom();
 
   const handleCreateRoom = async () => {
     try {

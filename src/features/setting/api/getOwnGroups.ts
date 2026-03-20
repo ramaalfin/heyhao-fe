@@ -4,6 +4,6 @@ import { OwnGroupsResponse } from "../schema/getOwnGroupsSchema";
 
 export const getOwnGroups = async () => {
   return instanceApiWithToken.get<BaseResponse<OwnGroupsResponse>>(
-    `/own-groups`,
+    `/groups/own-groups`,
   );
 };

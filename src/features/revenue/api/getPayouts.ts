@@ -3,7 +3,7 @@ import { BaseResponse } from "../../auth/types/response";
 import { PayoutValues } from "../utils/schema";
 
 export const getPayouts = async (): Promise<BaseResponse<PayoutValues>> => {
-    const response = await instanceApiWithToken.get<BaseResponse<PayoutValues>>("/payouts");
+    const response = await instanceApiWithToken.get<BaseResponse<PayoutValues>>("/transactions/payouts");
     return response.data;
 }
 

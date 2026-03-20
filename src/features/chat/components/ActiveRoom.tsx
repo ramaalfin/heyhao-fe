@@ -5,7 +5,10 @@ import { SignInResponse } from "../../auth/api/signIn";
 import dayjs from "dayjs";
 import FormSendMessage from "./FormSendMessage";
 import { useEffect, useState } from "react";
-import { pusher } from "../utils/pusher";
+import { useMessages, RealtimeMessage } from "../hooks/useMessages";
+import { useTypingIndicator } from "../hooks/useTypingIndicator";
+import { useRoomPresence } from "../hooks/useRoomPresence";
+import socketClient from "../../../shared/utils/socket";
 import GroupInfoModal from "./GroupInfoModal";
 import GalleryModal from "./GalleryModal";
 import PersonalInfoModal from "./PersonalInfoModal";
@@ -21,24 +24,38 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
   const [isPersonalInfoOpen, setIsPersonalInfoOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  // Local file messages sent via REST (so sender sees them immediately)
+  const [localFileMessages, setLocalFileMessages] = useState<RealtimeMessage[]>([]);
 
+  // WebSocket hooks
+  const { messages: realtimeMessages } = useMessages(roomId);
+  const { typingUsers } = useTypingIndicator(roomId);
+  const { isUserOnline } = useRoomPresence(roomId);
+
+  // Clear local file messages when room changes
   useEffect(() => {
-    if (!roomDetail) {
-      return;
-    }
+    setLocalFileMessages([]);
+  }, [roomId]);
 
-    const channelName = `chat-room-${roomDetail.id}`;
-    const eventName = `chat-room-${roomDetail.id}-event`;
+  // Join room only after socket is authenticated
+  useEffect(() => {
+    if (!roomId) return;
 
-    const channel = pusher.subscribe(channelName);
-    channel.bind(eventName, (data: any) => {
-      console.log(data);
-    });
+    // Try joining immediately (will queue if not yet authenticated)
+    socketClient.joinRoom(roomId);
+
+    // Also listen for authenticated event to join if it fires after mount
+    const socket = socketClient.getSocket();
+    const handleAuthenticated = () => {
+      socketClient.joinRoom(roomId);
+    };
+    socket?.on("authenticated", handleAuthenticated);
 
     return () => {
-      pusher.unsubscribe(channelName);
+      socket?.off("authenticated", handleAuthenticated);
+      socketClient.leaveRoom(roomId);
     };
-  }, [roomDetail]);
+  }, [roomId]);
 
   if (isLoading) {
     return (
@@ -70,19 +87,74 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
     }
 
     const otherMember = roomDetail.members.find((m) => m.user.id !== auth?.id);
+    const isOnline = otherMember ? isUserOnline(otherMember.user.id) : false;
+    
     return {
       name: otherMember?.user.name || "User",
       photoUrl: otherMember?.user.photo_url || "",
-      status: "Online",
-      statusColor: "text-heyhao-green",
-      statusBg: "bg-heyhao-green",
+      status: isOnline ? "Online" : "Offline",
+      statusColor: isOnline ? "text-heyhao-green" : "text-heyhao-secondary",
+      statusBg: isOnline ? "bg-heyhao-green" : "bg-heyhao-secondary",
     };
   };
 
   const header = getRoomHeader();
 
-  const groupedMessages: { [key: string]: typeof roomDetail.messages } = {};
-  roomDetail.messages.forEach((msg) => {
+  // Unified message type for rendering
+  interface NormalizedMessage {
+    id?: string;
+    content: string;
+    type: string;
+    content_url?: string | null;
+    created_at: string;
+    senderId: string;
+    senderName: string;
+    senderPhoto: string;
+  }
+
+  const normalizeDB = (msg: (typeof roomDetail.messages)[0]): NormalizedMessage => ({
+    id: msg.id,
+    content: msg.content,
+    type: msg.type,
+    content_url: msg.content_url,
+    created_at: msg.created_at,
+    senderId: msg.user?.id ?? "",
+    senderName: msg.user?.name ?? "Unknown",
+    senderPhoto: msg.user?.photo_url ?? "",
+  });
+
+  const normalizeRealtime = (msg: RealtimeMessage): NormalizedMessage => ({
+    id: msg.id,
+    content: msg.content,
+    type: msg.type,
+    content_url: msg.content_url,
+    created_at: msg.created_at,
+    senderId: msg.sender.id,
+    senderName: msg.sender.name,
+    senderPhoto: msg.sender.photo,
+  });
+
+  // Combine, normalize, deduplicate, sort
+  const allMessages = [
+    ...(roomDetail.messages || []).map(normalizeDB),
+    ...realtimeMessages.map(normalizeRealtime),
+    // File messages sent via REST — fill sender from auth
+    ...localFileMessages.map((msg) => ({
+      ...normalizeRealtime(msg),
+      senderId: msg.sender.id || auth?.id || "",
+      senderName: msg.sender.name || auth?.name || "You",
+      senderPhoto: msg.sender.photo || auth?.photo || "",
+    })),
+  ];
+  const uniqueMessages = allMessages.filter(
+    (msg, index, self) => index === self.findIndex((m) => m.id === msg.id)
+  );
+  const sortedMessages = uniqueMessages.sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  const groupedMessages: { [key: string]: typeof sortedMessages } = {};
+  sortedMessages.forEach((msg) => {
     const dateKey = dayjs(msg.created_at).format("YYYY-MM-DD");
     if (!groupedMessages[dateKey]) {
       groupedMessages[dateKey] = [];
@@ -145,13 +217,9 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                   <span className="font-semibold text-sm text-heyhao-secondary">
                     •
                   </span>
-                  {/* <span className="font-semibold text-sm text-heyhao-green">
-                  {
-                    header?.members?.filter((member) => member.user.is_online)
-                      .length
-                  }{" "}
-                  Online
-                </span> */}
+                  <span className={`font-semibold text-sm ${header.statusColor}`}>
+                    {header.status}
+                  </span>
                 </div>
               </div>
             </div>
@@ -232,10 +300,10 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                       {displayDate}
                     </p>
                     {msgs.map((msg, index) => {
-                      const isOut = msg.user?.id === auth?.id;
+                      const isOut = msg.senderId === auth?.id;
 
                       return (
-                        <div className="chat-row mt-5" key={index}>
+                        <div className="chat-row mt-5" key={msg.id || index}>
                           <div
                             className={`group flex flex-col gap-3 ${
                               isOut
@@ -276,24 +344,20 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                                   </span>
                                   <span> • </span>
                                   <span className="text-heyhao-black">
-                                    {isOut
-                                      ? "You"
-                                      : msg.user?.name || "Unknown"}
+                                    {isOut ? "You" : msg.senderName}
                                   </span>
                                 </p>
                               </div>
                               <div className="flex size-8 shrink-0 overflow-hidden rounded-full border border-heyhao-border pointer-events-none">
-                                {msg.user?.photo_url ? (
+                                {msg.senderPhoto ? (
                                   <img
-                                    src={msg.user.photo_url}
+                                    src={msg.senderPhoto}
                                     className="w-full h-full object-cover"
                                     alt="photo"
                                   />
                                 ) : (
                                   <div className="w-full h-full bg-heyhao-grey flex items-center justify-center text-heyhao-blue text-xs font-semibold">
-                                    {(msg.user?.name || "U")
-                                      .charAt(0)
-                                      .toUpperCase()}
+                                    {msg.senderName.charAt(0).toUpperCase()}
                                   </div>
                                 )}
                               </div>
@@ -303,16 +367,14 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                               <button
                                 onClick={() => {
                                   setIsGalleryOpen(true);
-                                  setSelectedImage(msg.content_url || "");
+                                  setSelectedImage(msg.content_url!);
                                 }}
                                 className="message-card preview-img relative max-w-[584px]"
                               >
                                 <img
                                   src={msg.content_url}
                                   className={`image max-w-[353px] max-h-[214px] overflow-hidden rounded-2xl object-contain ${
-                                    isOut
-                                      ? "rounded-tr-none"
-                                      : "rounded-tl-none"
+                                    isOut ? "rounded-tr-none" : "rounded-tl-none"
                                   }`}
                                   alt="image"
                                 />
@@ -339,10 +401,34 @@ export default function ActiveRoom({ roomId }: ActiveRoomProps) {
                   </div>
                 );
               })}
+              
+              {/* Typing indicator */}
+              {typingUsers.length > 0 && (
+                <div className="chat-row mt-5">
+                  <div className="group flex flex-col gap-3 message-in items-start">
+                    <div className="message-card relative max-w-[584px]">
+                      <div className="w-fit rounded-3xl rounded-tl-none py-3 px-4 bg-white">
+                        <p className="text-heyhao-blue text-sm">
+                          {typingUsers.map((u) => u.name).join(", ")}{" "}
+                          {typingUsers.length === 1 ? "is" : "are"} typing...
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </article>
 
             <div className="relative flex w-full z-30">
-              <FormSendMessage roomId={roomId} />
+              <FormSendMessage
+                roomId={roomId}
+                onFileMessageSent={(msg) => {
+                  setLocalFileMessages((prev) => {
+                    if (prev.some((m) => m.id === msg.id)) return prev;
+                    return [...prev, msg];
+                  });
+                }}
+              />
             </div>
           </div>
         </div>

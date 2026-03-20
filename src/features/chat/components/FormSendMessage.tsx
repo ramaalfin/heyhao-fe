@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import { useSendMessage } from "../hooks/useSendMessage";
+import { useTypingIndicator } from "../hooks/useTypingIndicator";
+import socketClient from "../../../shared/utils/socket";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import {
@@ -8,15 +10,18 @@ import {
   SendMessagePayload,
 } from "../schema/sendMessageSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { RealtimeMessage } from "../hooks/useMessages";
 
 interface Props {
   roomId: string;
+  onFileMessageSent?: (msg: RealtimeMessage) => void;
 }
 
-export default function FormSendMessage({ roomId }: Props) {
+export default function FormSendMessage({ roomId, onFileMessageSent }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // ✅ preview state
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   const {
     handleSubmit,
@@ -28,12 +33,33 @@ export default function FormSendMessage({ roomId }: Props) {
   });
 
   const { sendMessage, isPending } = useSendMessage(roomId);
+  const { startTyping, stopTyping } = useTypingIndicator(roomId);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value && value.trim().length > 0) {
+      if (!isTyping) {
+        setIsTyping(true);
+        startTyping();
+      }
+    } else {
+      if (isTyping) {
+        setIsTyping(false);
+        stopTyping();
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    if (isTyping) {
+      setIsTyping(false);
+      stopTyping();
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     setAttachedFile(file);
-
-    // ✅ generate object URL for image preview & cleanup old one
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     if (file && file.type.startsWith("image/")) {
       setPreviewUrl(URL.createObjectURL(file));
@@ -43,26 +69,59 @@ export default function FormSendMessage({ roomId }: Props) {
   };
 
   const clearAttachment = () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl); // ✅ cleanup memory
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setAttachedFile(null);
     setPreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const onSubmit = async (formValues: SendMessageFormValues) => {
-    const payload: SendMessagePayload = {
-      message: formValues.message,
-      room_id: roomId,
-      attach: attachedFile, // ✅ File object passed directly, null if none
-    };
-
-    try {
-      await sendMessage(payload);
-      reset();
-      clearAttachment();
-    } catch {
-      toast.error("Gagal mengirim pesan, silakan coba lagi.");
+    if (isTyping) {
+      setIsTyping(false);
+      stopTyping();
     }
+
+    // File message via REST API
+    if (attachedFile) {
+      const payload: SendMessagePayload = {
+        message: formValues.message || "",
+        room_id: roomId,
+        attach: attachedFile,
+      };
+      try {
+        const res = await sendMessage(payload);
+        const data = res.data.data;
+        // Manually push to realtime messages so sender sees it immediately
+        // (socket broadcast may not reach sender if they're not in the socket room yet)
+        if (onFileMessageSent && data) {
+          onFileMessageSent({
+            id: data.id,
+            roomId: data.room_id,
+            content: data.content,
+            type: (data.type as "TEXT" | "IMAGE") || "IMAGE",
+            content_url: data.content_url ?? undefined,
+            sender: { id: "", name: "", photo: "" }, // filled by ActiveRoom from auth
+            created_at: data.created_at,
+          });
+        }
+        reset();
+        clearAttachment();
+      } catch {
+        toast.error("Gagal mengirim pesan, silakan coba lagi.");
+      }
+      return;
+    }
+
+    // Text message via WebSocket
+    const text = formValues.message?.trim();
+    if (!text) return;
+
+    const sent = socketClient.sendMessage(roomId, text, "TEXT");
+    if (!sent) {
+      toast.error("Tidak terhubung ke server. Coba refresh halaman.");
+      return;
+    }
+    reset();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -79,7 +138,6 @@ export default function FormSendMessage({ roomId }: Props) {
       onSubmit={handleSubmit(onSubmit)}
       className="absolute bottom-0 w-full max-w-full p-5 z-20"
     >
-      {/* ✅ Image preview before send */}
       {previewUrl && isImage && (
         <div className="mb-2 relative inline-block">
           <img
@@ -97,7 +155,6 @@ export default function FormSendMessage({ roomId }: Props) {
         </div>
       )}
 
-      {/* ✅ Non-image file preview */}
       {attachedFile && !isImage && (
         <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-white rounded-xl ring-1 ring-heyhao-border w-fit max-w-xs">
           <img
@@ -123,6 +180,11 @@ export default function FormSendMessage({ roomId }: Props) {
           id="Chat-Input"
           {...register("message")}
           onKeyDown={handleKeyDown}
+          onChange={(e) => {
+            register("message").onChange(e);
+            handleInputChange(e);
+          }}
+          onBlur={handleBlur}
           spellCheck={false}
           placeholder="Type a message..."
           className="appearance-none outline-none w-full min-h-[60px] max-h-[200px] h-fit rounded-2xl p-5 pl-4 pr-[112px] bg-white font-medium leading-5 hide-scrollbar focus:ring-2 focus:ring-heyhao-blue transition-all duration-300 text-heyhao-black shadow-sm placeholder:text-heyhao-secondary"
@@ -135,7 +197,6 @@ export default function FormSendMessage({ roomId }: Props) {
         )}
 
         <div className="absolute flex right-2 bottom-2 gap-2">
-          {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -145,16 +206,16 @@ export default function FormSendMessage({ roomId }: Props) {
             onChange={handleFileChange}
           />
 
-          {/* Attach button */}
           <button
             type="button"
             id="Upload-Image"
             onClick={() => fileInputRef.current?.click()}
             title={attachedFile ? attachedFile.name : "Attach file"}
-            className={`size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 transition-all duration-300 ${attachedFile
+            className={`cursor-pointer size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 transition-all duration-300 ${
+              attachedFile
                 ? "ring-heyhao-blue"
                 : "ring-heyhao-border hover:ring-heyhao-blue"
-              }`}
+            }`}
           >
             <img
               src="/assets/images/icons/gallery-import.svg"
@@ -163,12 +224,12 @@ export default function FormSendMessage({ roomId }: Props) {
             />
           </button>
 
-          {/* Send button */}
           <button
             type="submit"
             disabled={isPending}
-            className={`flex shrink-0 w-11 transition-opacity duration-200 ${isPending ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`cursor-pointer flex shrink-0 w-11 transition-opacity duration-200 ${
+              isPending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <img
               src="/assets/images/icons/Send-Button-blue-bg.svg"

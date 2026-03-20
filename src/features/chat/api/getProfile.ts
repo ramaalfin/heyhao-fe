@@ -4,6 +4,6 @@ import { ProfileResponse } from "../schema/getProfileSchema";
 
 export const getProfile = async (id: string) => {
   return instanceApiWithToken.get<BaseResponse<ProfileResponse>>(
-    `/user/profile/${id}`,
+    `/users/user/profile/${id}`,
   );
 };

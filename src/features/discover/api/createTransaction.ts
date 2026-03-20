@@ -12,7 +12,7 @@ export type CreateTransactionResponse = z.infer<typeof createTransactionResponse
 export const createTransaction = async (
     groupId: string
 ): Promise<BaseResponse<CreateTransactionResponse>> => {
-    const response = await instanceApiWithToken.post<BaseResponse<CreateTransactionResponse>>(`/transactions`, {
+    const response = await instanceApiWithToken.post<BaseResponse<CreateTransactionResponse>>(`/transactions/transactions`, {
         group_id: groupId
     });
 

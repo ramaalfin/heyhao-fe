@@ -34,7 +34,7 @@ export const getRevenue = async (): Promise<
 > => {
   const response =
     await instanceApiWithToken.get<BaseResponse<GetRevenueResponse>>(
-      "/revenue",
+      "/transactions/revenue",
     );
 
   return response.data;

@@ -14,7 +14,7 @@ export default function WithdrawPage() {
   const { data: balance } = useGetBalance();
   const { mutateAsync: createPayouts, isPending: isPendingCreatePayouts } = useCreatePayouts();
 
-  const { control, handleSubmit, watch, formState: { errors } } = useForm<WithdrawValues>({
+  const { control, handleSubmit, formState: { errors } } = useForm<WithdrawValues>({
     resolver: zodResolver(withdrawSchema),
     defaultValues: {
       amount: "",
@@ -23,8 +23,6 @@ export default function WithdrawPage() {
       bank_account_name: "",
     },
   });
-
-  const amount = watch("amount");
 
   const auth = secureLocalStorage.getItem(AUTH_KEY) as SignUpResponse;
 

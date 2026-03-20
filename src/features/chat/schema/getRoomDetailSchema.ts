@@ -5,6 +5,7 @@ export const getRoomDetailSchema = z.object({
   is_group: z.boolean(),
   messages: z.array(
     z.object({
+      id: z.string().optional(),
       content: z.string(),
       type: z.string(),
       user: z

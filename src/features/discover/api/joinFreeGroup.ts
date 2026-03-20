@@ -9,7 +9,7 @@ export type JoinFreeGroupResponse = z.infer<typeof joinFreeGroupResponseSchema>;
 export const joinFreeGroup = async (
     groupId: string
 ): Promise<BaseResponse<JoinFreeGroupResponse>> => {
-    const response = await instanceApiWithToken.post<BaseResponse<JoinFreeGroupResponse>>(`/groups/join`, {
+    const response = await instanceApiWithToken.post<BaseResponse<JoinFreeGroupResponse>>(`/groups/groups/join`, {
         group_id: groupId
     });
 

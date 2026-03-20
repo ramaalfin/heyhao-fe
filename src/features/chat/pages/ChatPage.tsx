@@ -6,11 +6,15 @@ import { AUTH_KEY } from "../../../shared/utils/constant";
 import { RoomResponseValues } from "../schema/getRoomSchema";
 import { SignInResponse } from "../../auth/api/signIn";
 import { useGetRooms } from "../hooks/useGetRooms";
+import { useSocket } from "../hooks/useSocket";
 import dayjs from "dayjs";
 import ActiveRoom from "../components/ActiveRoom";
 
 export default function ChatPage() {
   const auth = secureLocalStorage.getItem(AUTH_KEY) as SignInResponse;
+  
+  // Initialize WebSocket connection
+  const { isConnected, isAuthenticated } = useSocket();
 
   const [searchValue, setSearchValue] = useState("");
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -81,7 +85,17 @@ export default function ChatPage() {
               id="Top-Bar"
               className="flex items-center justify-between border-b border-heyhao-border py-6 px-5 gap-3"
             >
-              <p className="font-semibold text-2xl">Chats</p>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-2xl">Chats</p>
+                {isConnected && (
+                  <div className="flex items-center gap-1">
+                    <div className="size-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs text-heyhao-secondary">
+                      {isAuthenticated ? "Connected" : "Connecting..."}
+                    </span>
+                  </div>
+                )}
+              </div>
               <ul className="flex gap-3">
                 <li className="group">
                   <Link

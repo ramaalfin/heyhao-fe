@@ -14,7 +14,7 @@ export type GetDiscoverPeopleResponse = z.infer<typeof getDiscoverPeopleResponse
 export const getDiscoverPeople = async (
     name?: string
 ): Promise<BaseResponse<GetDiscoverPeopleResponse>> => {
-    const response = await instanceApiWithToken.get<BaseResponse<GetDiscoverPeopleResponse>>("/peoples", {
+    const response = await instanceApiWithToken.get<BaseResponse<GetDiscoverPeopleResponse>>("/groups/peoples", {
         params: {
             name
         }
