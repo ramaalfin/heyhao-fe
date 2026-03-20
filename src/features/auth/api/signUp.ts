@@ -8,6 +8,7 @@ export const signUpResponseSchema = z.object({
   email: z.string(),
   photo: z.string(),
   token: z.string(),
+  refreshToken: z.string(),
 });
 
 export type SignUpResponse = z.infer<typeof signUpResponseSchema>;
